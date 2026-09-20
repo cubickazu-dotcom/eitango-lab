@@ -731,6 +731,7 @@ button,.pill,.seg-btn,.opt,.chapter-card{touch-action:manipulation; -webkit-tap-
 }
 </style>
 </head>
+#ocr-status-text{white-space:pre-line;}
 <body>
 
 <div id="app">
@@ -1457,18 +1458,69 @@ function getWorker(kind){
   return ocrWorkers[kind];
 }
 
-/* ---- image preprocessing: orientation fix, resize, grayscale, contrast stretch ---- */
-function loadBitmap(file){
+/* ---- image loading: orientation-safe (iPhone camera photos carry their rotation in EXIF) ---- */
+function decodeImage(blob){
   if(window.createImageBitmap){
-    return createImageBitmap(file, {imageOrientation:"from-image"}).catch(function(){ return createImageBitmap(file); });
+    return createImageBitmap(blob, {imageOrientation:"from-image"}).catch(function(){ return createImageBitmap(blob); });
   }
   return new Promise(function(resolve, reject){
     var img = new Image();
-    var url = URL.createObjectURL(file);
+    var url = URL.createObjectURL(blob);
     img.onload = function(){ URL.revokeObjectURL(url); resolve(img); };
     img.onerror = function(){ reject(new Error("画像を読み込めませんでした")); };
     img.src = url;
   });
+}
+/* 2x1 JPEG whose EXIF says "rotate 90": a browser that honours EXIF decodes it as 1x2 */
+var ORIENT_TEST_B64 = "/9j/4AAQSkZJRgABAQAAAQABAAD/4QAiRXhpZgAATU0AKgAAAAgAAQESAAMAAAABAAYAAAAAAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQQEBQoHBwYIDAoMDAsKCwsNDhIQDQ4RDgsLEBYQERMUFRUVDA8XGBYUGBIUFRT/2wBDAQMEBAUEBQkFBQkUDQsNFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBT/wAARCAABAAIDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD4H8Q/8h/Uv+vmX/0M0UUV/ptkP/Ipwn/XuH/pKPAzr/kZ4r/r5P8A9KZ//9k=";
+var exifSupportPromise = null;
+function browserAppliesExif(){
+  if(exifSupportPromise) return exifSupportPromise;
+  exifSupportPromise = new Promise(function(resolve){
+    try{
+      var bin = atob(ORIENT_TEST_B64), arr = new Uint8Array(bin.length);
+      for(var i=0;i<bin.length;i++) arr[i] = bin.charCodeAt(i);
+      decodeImage(new Blob([arr], {type:"image/jpeg"})).then(function(bmp){
+        var applied = (bmp.width === 1 && bmp.height === 2);
+        if(bmp.close) bmp.close();
+        resolve(applied);
+      }).catch(function(){ resolve(true); });
+    }catch(e){ resolve(true); }
+  });
+  return exifSupportPromise;
+}
+function readOrientation(file){
+  return new Promise(function(resolve){
+    try{
+      var rd = new FileReader();
+      rd.onload = function(){
+        try{
+          var v = new DataView(rd.result), off = 2;
+          if(v.byteLength < 12 || v.getUint16(0) !== 0xFFD8) return resolve(1);
+          while(off + 4 < v.byteLength){
+            var marker = v.getUint16(off), len = v.getUint16(off + 2);
+            if((marker & 0xFF00) !== 0xFF00 || marker === 0xFFDA) break;
+            if(marker === 0xFFE1 && v.getUint32(off + 4) === 0x45786966){          // "Exif"
+              var t = off + 10, little = v.getUint16(t) === 0x4949;
+              var ifd = t + v.getUint32(t + 4, little), n = v.getUint16(ifd, little);
+              for(var i=0;i<n;i++){
+                var e = ifd + 2 + i*12;
+                if(v.getUint16(e, little) === 0x0112){ var o = v.getUint16(e + 8, little); return resolve(o >= 1 && o <= 8 ? o : 1); }
+              }
+              return resolve(1);
+            }
+            off += 2 + len;
+          }
+        }catch(err){}
+        resolve(1);
+      };
+      rd.onerror = function(){ resolve(1); };
+      rd.readAsArrayBuffer(file.slice(0, 262144));
+    }catch(e){ resolve(1); }
+  });
+}
+function orientMatrix(o, w, h){      // raw w x h image -> upright drawing matrix [a,b,c,d,e,f]
+  return [null,[1,0,0,1,0,0],[-1,0,0,1,w,0],[-1,0,0,-1,w,h],[1,0,0,-1,0,h],[0,1,1,0,0,0],[0,1,-1,0,h,0],[0,-1,-1,0,h,w],[0,-1,1,0,0,w]][o];
 }
 /* ---- OCR text -> [{en, ja, warn}] ---- */
 var JA_CLASS = "\\u3040-\\u30ff\\u3400-\\u4dbf\\u4e00-\\u9fff\\uff01-\\uff60\\uff66-\\uff9f\\u3001\\u3002\\u300c-\\u300f\\u30fb\\u301c\\uff5e";
@@ -1580,22 +1632,46 @@ function parseLines(lines){
 }
 
 /* ---- image loading: colour canvas (needed to pick out red text) ---- */
-function loadColorCanvas(file){
-  return loadBitmap(file).then(function(bmp){
-    var w = bmp.width, h = bmp.height;
-    var longSide = Math.max(w, h);
-    var scale = 1;
-    if(longSide > 2400) scale = 2400 / longSide;
-    else if(longSide < 1600) scale = Math.min(2, 1600 / longSide);
-    var cw = Math.round(w*scale), ch = Math.round(h*scale);
-    var cv = document.createElement("canvas");
-    cv.width = cw; cv.height = ch;
-    var ctx = cv.getContext("2d", {willReadFrequently:true});
-    ctx.fillStyle = "#fff"; ctx.fillRect(0,0,cw,ch);
-    ctx.drawImage(bmp, 0, 0, cw, ch);
-    if(bmp.close) bmp.close();
-    return cv;
+function loadColorCanvas(file, maxSide){
+  maxSide = maxSide || 2400;
+  return Promise.all([readOrientation(file), browserAppliesExif()]).then(function(r){
+    var orient = r[0], applies = r[1];
+    return decodeImage(file).then(function(bmp){
+      var rw = bmp.width, rh = bmp.height;
+      var manual = orient !== 1 && !applies;              // the browser left the photo sideways: turn it ourselves
+      var swap = manual && orient >= 5;
+      var w = swap ? rh : rw, h = swap ? rw : rh;
+      var longSide = Math.max(w, h), scale = 1;
+      if(longSide > maxSide) scale = maxSide / longSide;
+      else if(longSide < 1600) scale = Math.min(2, 1600 / longSide);
+      var cw = Math.round(w*scale), ch = Math.round(h*scale);
+      var cv = document.createElement("canvas");
+      cv.width = cw; cv.height = ch;
+      var ctx = cv.getContext("2d", {willReadFrequently:true});
+      ctx.fillStyle = "#fff"; ctx.fillRect(0,0,cw,ch);
+      ctx.imageSmoothingQuality = "high";
+      if(manual){
+        var m = orientMatrix(orient, rw, rh);
+        ctx.setTransform(m[0]*scale, m[1]*scale, m[2]*scale, m[3]*scale, m[4]*scale, m[5]*scale);
+        ctx.drawImage(bmp, 0, 0);
+        ctx.setTransform(1,0,0,1,0,0);
+      }else ctx.drawImage(bmp, 0, 0, cw, ch);
+      if(bmp.close) bmp.close();
+      cv.srcInfo = {w:rw, h:rh, longSide:longSide, orient:orient, manual:manual};
+      return cv;
+    });
   });
+}
+function rotate90(cv, dir){        // dir 1 = clockwise, -1 = counter-clockwise
+  var out = document.createElement("canvas");
+  out.width = cv.height; out.height = cv.width;
+  var ctx = out.getContext("2d", {willReadFrequently:true});
+  ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, out.width, out.height);
+  if(dir > 0){ ctx.translate(out.width, 0); ctx.rotate(Math.PI/2); }
+  else { ctx.translate(0, out.height); ctx.rotate(-Math.PI/2); }
+  ctx.drawImage(cv, 0, 0);
+  out.srcInfo = cv.srcInfo;
+  return out;
 }
 
 /* ---- RED MODE ------------------------------------------------------------
@@ -1764,7 +1840,7 @@ function redBands(sc, w, h, wx0, wx1){
   if(nz.length < 20) return [];
   nz.sort(function(a,b){ return a-b; });
   var p95 = nz[Math.floor(nz.length*0.95)];
-  var thr = Math.max(4, p95*0.10);
+  var thr = Math.max(3, p95*0.06);
   var bands = [], cur = null;
   for(y=0;y<h;y++){
     if(rc[y] >= thr){ if(cur && y - cur.yb <= 3) cur.yb = y; else { cur = {ya:y, yb:y}; bands.push(cur); } }
@@ -1881,7 +1957,7 @@ function readMeaning(worker, cv, prm, row){
   targets.forEach(function(tg, k){
     chain = chain.then(function(){
       if(best && best.conf >= 70 && best.n >= 1) return;              // good enough already
-      var c = meaningCanvas(cv, prm, row, tg);
+      var c = meaningCanvas(cv, row.prm || prm, row, tg);
       if(!c) return;
       return worker.recognize(c, {}, {text:true}).then(function(res){
         var data = (res && res.data) || {};
@@ -1891,7 +1967,7 @@ function readMeaning(worker, cv, prm, row){
       });
     });
   });
-  return chain.then(function(){ return best ? best.t : ""; });
+  return chain.then(function(){ row.jaConf = best ? best.conf : 0; return best ? best.t : ""; });
 }
 
 /* ---- headword (English word to the left of the red line) ---- */
@@ -1999,21 +2075,74 @@ function readHeadword(engWorker, cv, row, quick){
   });
 }
 
+function analyzeRed(c){                 // find the red meaning lines on one (already upright) canvas
+  var prm = redParams(c);
+  var sc = redScoreMap(c, prm);
+  var ang = estimateSkew(sc, c.width, c.height);
+  if(ang){ c = rotateCanvas(c, ang); sc = redScoreMap(c, prm); }
+  var rows = findRedRows(sc, c.width, c.height);
+  // second, more forgiving pass: pale lines (glare, shadow, JPEG noise) that the strict pass just missed
+  if(rows.length >= 2){
+    var prm2 = {lo:Math.max(0.05, prm.lo - 0.06), hi:prm.hi*0.86};
+    var rows2 = findRedRows(redScoreMap(c, prm2), c.width, c.height), mh = medianH(rows), added = 0;
+    rows2.forEach(function(r2){
+      if(r2.H < 0.75*mh || r2.H > 1.3*mh) return;
+      var yc = (r2.ya + r2.yb)/2, clash = rows.some(function(r){ return Math.abs((r.ya + r.yb)/2 - yc) < 0.7*mh; });
+      if(clash) return;
+      r2.prm = prm2; rows.push(r2); added++;
+    });
+    if(added) rows.sort(function(a,b){ return a.ya - b.ya; });
+  }
+  return {cv:c, prm:prm, rows:rows, ang:ang || 0};
+}
+function medianH(rows){
+  if(!rows.length) return 0;
+  var hs = rows.map(function(r){ return r.H; }).sort(function(a,b){ return a-b; });
+  return hs[Math.floor(hs.length/2)];
+}
 function processRedPhoto(worker, engWorker, file, idx, n){
   var base = idx / n, span = 1 / n;
-  var cv = null, prm = null, rows = [];
+  var cv = null, prm = null, rows = [], diag = [];
   function st(msg, f){ setOcrStatus("写真 "+(idx+1)+" / "+n+": "+msg, base + span*f); }
+  function tick(){ return new Promise(function(res){ setTimeout(res, 20); }); }   // let the status text paint
   st("準備中…", 0.0);
   return loadColorCanvas(file).then(function(c){
-    return new Promise(function(res){ setTimeout(function(){ res(c); }, 20); });   // let the status text paint
+    return tick().then(function(){ return c; });
   }).then(function(c){
     st("赤字の位置を探しています…", 0.03);
-    prm = redParams(c);
-    var sc = redScoreMap(c, prm);
-    var ang = estimateSkew(sc, c.width, c.height);
-    if(ang){ c = rotateCanvas(c, ang); sc = redScoreMap(c, prm); }
-    cv = c;
-    rows = findRedRows(sc, c.width, c.height);
+    var info = c.srcInfo || {};
+    diag.push("画像 "+(info.w||"?")+"x"+(info.h||"?")+" / 向き情報 "+(info.orient||1)+(info.manual ? "(手動で補正)" : ""));
+    var a = analyzeRed(c);
+    // nothing found: the photo may still be sideways -> try quarter turns
+    if(a.rows.length < 4){
+      var best = a, bestTag = "0";
+      [[1,"90"],[-1,"270"]].forEach(function(t){
+        var alt = analyzeRed(rotate90(c, t[0]));
+        if(alt.rows.length > best.rows.length + 1){ best = alt; bestTag = t[1]; }
+      });
+      if(bestTag !== "0") diag.push("横向きを検出 → "+bestTag+"°回転");
+      a = best;
+    }
+    // small text: re-read the source at a higher resolution
+    var longNow = Math.max(a.cv.width, a.cv.height), info2 = c.srcInfo || {};
+    if(a.rows.length && medianH(a.rows) < 28 && info2.longSide && info2.longSide > longNow*1.15){
+      st("文字が小さいため高解像度で読み直します…", 0.05);
+      return tick().then(function(){ return loadColorCanvas(file, 3200); }).then(function(c2){
+        var a2 = analyzeRed(c2);
+        if(a2.rows.length < 2 && a.rows.length >= 2){ /* rotation may have been applied to the first pass */
+          [[1,"90"],[-1,"270"]].forEach(function(t){
+            var alt = analyzeRed(rotate90(c2, t[0]));
+            if(alt.rows.length > a2.rows.length) a2 = alt;
+          });
+        }
+        if(a2.rows.length >= a.rows.length){ diag.push("高解像度で再解析"); return a2; }
+        return a;
+      }).catch(function(){ return a; });
+    }
+    return a;
+  }).then(function(a){
+    cv = a.cv; prm = a.prm; rows = a.rows;
+    diag.push("赤い行 "+rows.length+" / 行の高さ "+Math.round(medianH(rows))+"px / 傾き補正 "+(Math.round(a.ang*10)/10)+"°");
     return worker.setParameters({tessedit_pageseg_mode:"7", tessedit_char_whitelist:"", preserve_interword_spaces:"1"});
   }).then(function(){
     if(!rows.length) return [];
@@ -2053,7 +2182,12 @@ function processRedPhoto(worker, engWorker, file, idx, n){
     });
     var lines = pairs.map(function(p){ return (p.en || "(?)") + "  |  " + (p.ja || "(?)"); });
     if(!pairs.length) lines = ["(赤字の日本語が見つかりませんでした)"];
-    return {pairs:pairs, lines:lines};
+    var cs = rows.map(function(r){ return r.jaConf; }).filter(function(v){ return typeof v === "number"; });
+    var avg = cs.length ? cs.reduce(function(x,y){ return x+y; }, 0)/cs.length : 0;
+    diag.push("読み取り信頼度 平均 "+Math.round(avg));
+    lines.unshift("[診断] "+diag.join(" / "));
+    var weak = pairs.length > 0 && avg < 55, few = pairs.length > 0 && pairs.length < 3;
+    return {pairs:pairs, lines:lines, weak:weak, few:few};
   });
 }
 
@@ -2121,14 +2255,14 @@ function handleFiles(fileList){
   ocrBusy = true; setOcrBusyUI();
   var n = files.length, chapterAtStart = curCh;
   var mode = $("ocr-mode").value;
-  var before = ocrRows.length;
+  var before = ocrRows.length, weakPhotos = 0;
   setOcrStatus("読み取りエンジンを準備中… (初回は言語データのダウンロードに時間がかかります)", 0.02);
   ocrLogger = function(m){
     if(/loading|initializ/.test(m.status || "")){
       setOcrStatus("読み取り用データを準備中… (初回のみ) "+Math.round((m.progress||0)*100)+"%", 0.02);
     }
   };
-  var need = (mode === "red") ? Promise.all([getWorker("jpn"), getWorker("eng")]) : getWorker("engjpn").then(function(w){ return [w]; });
+  var need = (mode === "red") ? getWorker("jpn").then(function(j){ return getWorker("eng").then(function(e){ return [j, e]; }); }) : getWorker("engjpn").then(function(w){ return [w]; });
   need.then(function(ws){
     var worker = ws[0], engWorker = ws[1];
     var chain = Promise.resolve();
@@ -2138,6 +2272,7 @@ function handleFiles(fileList){
         return p.then(function(res){
           if(chapterAtStart !== curCh) return;   // user switched chapter meanwhile
           ocrRaw.push(res.lines.join("\n"));
+          if(res.weak) weakPhotos++;
           ocrPhotos++;
           res.pairs.forEach(function(r){
             var warn = !!r.warn;
@@ -2156,7 +2291,8 @@ function handleFiles(fileList){
         ? "赤字の日本語が見つかりませんでした。明るい場所で撮り直すか、読み取りモードを「汎用」に切り替えてお試しください。"
         : "単語を検出できませんでした。", 0, true);
     }else{
-      setOcrStatus("読み取り完了: "+found+"語を検出しました。内容を確認して「追加する」を押してください。", 1);
+      setOcrStatus("読み取り完了: "+found+"語を検出しました。内容を確認して「追加する」を押してください。"+
+        (weakPhotos ? "\n※ 文字がぼやけているようです。明るい場所で、ページを平らにしてピントを合わせ、少し離れてゆっくり撮ると精度が上がります。" : ""), 1);
     }
   }).catch(function(err){
     console.error(err);
@@ -2948,7 +3084,7 @@ $("data-import-file").addEventListener("change", function(e){
 /* ============================================================
    BOOT
    ============================================================ */
-window.VocabApp = {parseOcrText: parseOcrText, parseLines: parseLines, rowsFromWords: rowsFromWords, makeRedMask: makeRedMask, loadColorCanvas: loadColorCanvas, dictHasPhrase: dictHasPhrase, dictFix: dictFix, redParams: redParams, redScoreMap: redScoreMap, estimateSkew: estimateSkew, rotateCanvas: rotateCanvas, findRedRows: findRedRows, meaningCanvas: meaningCanvas, headwordCanvas: headwordCanvas};   // 動作確認用
+window.VocabApp = {parseOcrText: parseOcrText, parseLines: parseLines, rowsFromWords: rowsFromWords, makeRedMask: makeRedMask, loadColorCanvas: loadColorCanvas, dictHasPhrase: dictHasPhrase, dictFix: dictFix, redParams: redParams, redScoreMap: redScoreMap, estimateSkew: estimateSkew, rotateCanvas: rotateCanvas, findRedRows: findRedRows, redBands: redBands, bandRuns: bandRuns, meaningCanvas: meaningCanvas, headwordCanvas: headwordCanvas};   // 動作確認用
 buildNav();
 show("home");
 initFirebase();
