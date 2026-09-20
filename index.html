@@ -1,0 +1,2478 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>英単語 攻略ラボ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@500;700;900&family=Noto+Sans+JP:wght@400;500;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* ============ TOKENS ============ */
+:root{
+  --bg:#F1F4FA;
+  --bg-alt:#E7ECF7;
+  --surface:#FFFFFF;
+  --surface-2:#F8FAFD;
+  --border:#DDE3F0;
+  --text:#161B2C;
+  --text-muted:#5B6478;
+  --text-faint:#8891A8;
+  --accent:#2C4BD4;
+  --accent-strong:#1E3AA8;
+  --accent-soft:#E7ECFF;
+  --accent-contrast:#FFFFFF;
+  --success:#128F63;
+  --success-soft:#E1F5EC;
+  --danger:#D6455A;
+  --danger-soft:#FCE7EA;
+  --warning:#B8790F;
+  --warning-soft:#FBF0DC;
+  --shadow: 220 45% 25%;
+  --ch1:#2C4BD4; --ch2:#7B3FE4; --ch3:#0E8F7A; --ch4:#C9701A; --ch5:#B23B7A; --ch6:#1F7FBF;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0C1120;
+    --bg-alt:#121A2E;
+    --surface:#151E33;
+    --surface-2:#1B2540;
+    --border:#2B3859;
+    --text:#E8ECFB;
+    --text-muted:#9BA6C4;
+    --text-faint:#6C7796;
+    --accent:#7E9DFF;
+    --accent-strong:#AEC1FF;
+    --accent-soft:#1E2A4D;
+    --accent-contrast:#0C1120;
+    --success:#4FD9A4;
+    --success-soft:#11311F;
+    --danger:#FF8695;
+    --danger-soft:#391720;
+    --warning:#E8B563;
+    --warning-soft:#382A0F;
+    --ch1:#8CA6FF; --ch2:#B39BFF; --ch3:#5BD1B3; --ch4:#F0AE60; --ch5:#F090BE; --ch6:#7FC4F2;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0C1120;
+  --bg-alt:#121A2E;
+  --surface:#151E33;
+  --surface-2:#1B2540;
+  --border:#2B3859;
+  --text:#E8ECFB;
+  --text-muted:#9BA6C4;
+  --text-faint:#6C7796;
+  --accent:#7E9DFF;
+  --accent-strong:#AEC1FF;
+  --accent-soft:#1E2A4D;
+  --accent-contrast:#0C1120;
+  --success:#4FD9A4;
+  --success-soft:#11311F;
+  --danger:#FF8695;
+  --danger-soft:#391720;
+  --warning:#E8B563;
+  --warning-soft:#382A0F;
+  --ch1:#8CA6FF; --ch2:#B39BFF; --ch3:#5BD1B3; --ch4:#F0AE60; --ch5:#F090BE; --ch6:#7FC4F2;
+}
+
+*{box-sizing:border-box;}
+html{color-scheme:light dark;}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:"Noto Sans JP","Hiragino Kaku Gothic ProN",sans-serif;
+  -webkit-font-smoothing:antialiased;
+  line-height:1.6;
+}
+h1,h2,h3,h4{
+  font-family:"Zen Kaku Gothic New","Noto Sans JP",sans-serif;
+  text-wrap:balance;
+  margin:0;
+}
+.mono{font-family:"JetBrains Mono",monospace;}
+button{font-family:inherit;}
+a{color:var(--accent);}
+::selection{background:var(--accent-soft);}
+
+/* ============ APP SHELL ============ */
+#app{
+  display:flex;
+  min-height:100vh;
+}
+
+/* --- Sidebar (desktop) --- */
+.sidebar{
+  width:230px;
+  flex:none;
+  background:var(--surface);
+  border-right:1px solid var(--border);
+  display:flex;
+  flex-direction:column;
+  padding:20px 14px;
+  gap:22px;
+  position:sticky;
+  top:0;
+  height:100vh;
+}
+.brand{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:0 6px;
+}
+.brand-badge{
+  font-family:"JetBrains Mono",monospace;
+  font-weight:700;
+  font-size:12px;
+  letter-spacing:.04em;
+  background:var(--accent);
+  color:var(--accent-contrast);
+  padding:4px 7px;
+  border-radius:6px;
+}
+.brand-name{
+  font-family:"Zen Kaku Gothic New",sans-serif;
+  font-weight:900;
+  font-size:16.5px;
+  letter-spacing:.01em;
+}
+.nav{
+  display:flex;
+  flex-direction:column;
+  gap:3px;
+}
+.nav-item{
+  display:flex;
+  align-items:center;
+  gap:11px;
+  padding:10px 12px;
+  border-radius:10px;
+  color:var(--text-muted);
+  cursor:pointer;
+  font-size:14.5px;
+  font-weight:500;
+  border:1px solid transparent;
+  background:none;
+  text-align:left;
+  width:100%;
+}
+.nav-item svg{flex:none;width:18px;height:18px;stroke:currentColor;}
+.nav-item:hover{background:var(--surface-2); color:var(--text);}
+.nav-item.active{
+  background:var(--accent-soft);
+  color:var(--accent-strong);
+  font-weight:700;
+}
+.sidebar-foot{
+  margin-top:auto;
+  padding:10px 6px 0;
+  font-size:12px;
+  color:var(--text-faint);
+  border-top:1px solid var(--border);
+  padding-top:14px;
+}
+
+/* --- Main --- */
+.main{
+  flex:1;
+  min-width:0;
+  padding:34px 40px 100px;
+}
+.view{max-width:980px; margin:0 auto;}
+.view[hidden]{display:none;}
+
+.page-head{
+  margin-bottom:26px;
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+}
+.page-head .eyebrow{
+  font-family:"JetBrains Mono",monospace;
+  font-size:11.5px;
+  font-weight:700;
+  letter-spacing:.08em;
+  color:var(--accent);
+  text-transform:uppercase;
+}
+.page-head h1{font-size:26px; font-weight:900;}
+.page-head p{color:var(--text-muted); font-size:14.5px; margin-top:2px;}
+
+/* ============ CARDS / GRID ============ */
+.stat-row{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:14px;
+  margin-bottom:28px;
+}
+.stat-card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:16px 18px;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+.stat-card .num{
+  font-family:"JetBrains Mono",monospace;
+  font-weight:700;
+  font-size:24px;
+  font-variant-numeric:tabular-nums;
+}
+.stat-card .lbl{font-size:12.5px; color:var(--text-muted);}
+
+.chapter-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:14px;
+}
+.chapter-card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:18px;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  cursor:pointer;
+  text-align:left;
+  position:relative;
+  overflow:hidden;
+}
+.chapter-card::before{
+  content:"";
+  position:absolute; inset:0 0 auto 0; height:4px;
+  background:var(--ch-color);
+}
+.chapter-card .ch-top{
+  display:flex; align-items:center; justify-content:space-between;
+}
+.chapter-card .ch-num{
+  font-family:"JetBrains Mono",monospace;
+  font-weight:700;
+  font-size:12px;
+  color:var(--ch-color);
+  background:color-mix(in srgb, var(--ch-color) 14%, transparent);
+  padding:3px 8px;
+  border-radius:999px;
+}
+.chapter-card h3{font-size:16px; font-weight:700; line-height:1.4;}
+.chapter-card .ch-meta{
+  display:flex; justify-content:space-between; align-items:center;
+  font-size:12px; color:var(--text-muted);
+}
+.progress-track{
+  height:6px; border-radius:999px; background:var(--bg-alt); overflow:hidden;
+}
+.progress-fill{
+  height:100%; border-radius:999px; background:var(--ch-color);
+}
+
+.panel{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:22px;
+}
+
+/* ============ PILLS / BUTTONS ============ */
+.pill-row{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px;}
+.pill{
+  border:1px solid var(--border);
+  background:var(--surface);
+  color:var(--text-muted);
+  padding:7px 14px;
+  border-radius:999px;
+  font-size:13.5px;
+  font-weight:500;
+  cursor:pointer;
+}
+.pill:hover{border-color:var(--accent);}
+.pill.active{
+  background:var(--accent);
+  color:var(--accent-contrast);
+  border-color:var(--accent);
+  font-weight:700;
+}
+.btn{
+  font-weight:700;
+  font-size:14px;
+  border-radius:10px;
+  padding:11px 20px;
+  border:1px solid transparent;
+  cursor:pointer;
+}
+.btn-primary{background:var(--accent); color:var(--accent-contrast);}
+.btn-primary:hover{background:var(--accent-strong);}
+.btn-ghost{background:var(--surface); border-color:var(--border); color:var(--text);}
+.btn-ghost:hover{border-color:var(--accent); color:var(--accent);}
+.btn-danger{background:var(--danger); color:#fff;}
+.btn-danger:hover{filter:brightness(0.94);}
+.btn-row{display:flex; gap:10px; flex-wrap:wrap;}
+.wrong-review-box{
+  display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap;
+  background:var(--danger-soft); border-radius:14px; padding:16px 18px; margin-bottom:20px;
+}
+.wrong-review-title{font-weight:800; font-size:14.5px; color:var(--danger);}
+.wrong-review-sub{font-size:12.5px; color:var(--text-muted); margin-top:2px;}
+.data-panel-note{margin:0 0 14px; font-size:13px; color:var(--text-muted); line-height:1.6;}
+.btn:disabled{opacity:.45; cursor:not-allowed;}
+
+/* ============ FLASHCARDS ============ */
+.fc-wrap{display:flex; flex-direction:column; align-items:center; gap:20px;}
+.fc-progress{
+  width:100%; display:flex; align-items:center; gap:12px; font-size:13px; color:var(--text-muted);
+}
+.fc-progress .progress-track{flex:1; background:var(--bg-alt); --ch-color:var(--accent);}
+.fc-progress .progress-fill{background:var(--accent);}
+.flashcard{
+  width:100%;
+  max-width:560px;
+  min-height:280px;
+  perspective:1400px;
+  cursor:pointer;
+}
+.flashcard-inner{
+  position:relative;
+  width:100%; height:100%; min-height:280px;
+  transform-style:preserve-3d;
+  transition:transform .5s cubic-bezier(.2,.7,.3,1);
+}
+.flashcard.flipped .flashcard-inner{transform:rotateY(180deg);}
+.fc-face{
+  position:absolute; inset:0;
+  backface-visibility:hidden;
+  border-radius:20px;
+  border:1px solid var(--border);
+  background:var(--surface);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:36px 30px;
+  gap:16px;
+  box-shadow:0 12px 30px -18px hsl(var(--shadow) / .35);
+}
+.fc-face.back{transform:rotateY(180deg); background:var(--accent-soft);}
+.flashcard.status-mastered .fc-face{border-color:var(--success); background:var(--success-soft);}
+.flashcard.status-mastered .fc-face.back{background:var(--success-soft);}
+.flashcard.status-review .fc-face{border-color:var(--danger); background:var(--danger-soft);}
+.flashcard.status-review .fc-face.back{background:var(--danger-soft);}
+.fc-top-row{
+  display:flex; align-items:center; justify-content:center;
+  flex-wrap:wrap; gap:8px;
+  position:absolute; top:16px; left:16px; right:16px;
+}
+.fc-tag{
+  font-family:"JetBrains Mono",monospace;
+  font-size:11px; font-weight:700; letter-spacing:.05em;
+  color:var(--ch-color, var(--accent));
+  background:color-mix(in srgb, var(--ch-color, var(--accent)) 14%, transparent);
+  padding:3px 9px; border-radius:999px;
+  flex:none;
+}
+.fc-cat{
+  font-size:11px; font-weight:700; letter-spacing:.01em;
+  color:var(--text-muted);
+  background:var(--surface-2);
+  border:1px solid var(--border);
+  padding:3px 10px; border-radius:999px;
+  max-width:100%;
+}
+.fc-hint{position:absolute; bottom:14px; font-size:11.5px; color:var(--text-faint);}
+.fc-term{font-size:26px; font-weight:900; font-family:"Zen Kaku Gothic New";}
+.fc-term-back{font-size:15.5px; font-weight:800; color:var(--accent); font-family:"Zen Kaku Gothic New";}
+.fc-def{font-size:16px; color:var(--text); max-width:440px;}
+.fc-controls{display:flex; gap:10px; align-items:center; flex-wrap:wrap; justify-content:center;}
+.iconbtn{
+  width:42px; height:42px; border-radius:50%;
+  border:1px solid var(--border); background:var(--surface);
+  display:flex; align-items:center; justify-content:center; cursor:pointer;
+  color:var(--text-muted);
+}
+.iconbtn:hover{border-color:var(--accent); color:var(--accent);}
+.iconbtn svg{width:18px;height:18px;stroke:currentColor;}
+.iconbtn:disabled{opacity:.35; cursor:default; pointer-events:none;}
+.status-btn{
+  padding:11px 18px; border-radius:10px; font-weight:700; font-size:13.5px; cursor:pointer; border:1px solid;
+}
+.status-btn.review{background:var(--danger-soft); border-color:transparent; color:var(--danger);}
+.status-btn.mastered{background:var(--success-soft); border-color:transparent; color:var(--success);}
+.status-btn:hover{filter:brightness(0.96);}
+.status-btn.is-active{outline:2px solid currentColor; outline-offset:2px;}
+
+/* ============ QUIZ ============ */
+.quiz-setup .pill-row{margin-bottom:6px;}
+.setup-label{font-size:12.5px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:.06em; margin:18px 0 10px;}
+.q-progress{display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; font-size:13px; color:var(--text-muted);}
+.q-timer{font-family:"JetBrains Mono",monospace; font-weight:700; color:var(--text);}
+.q-timer.low{color:var(--danger);}
+.q-card{background:var(--surface); border:1px solid var(--border); border-radius:18px; padding:26px; margin-bottom:18px;}
+.q-tag{font-family:"JetBrains Mono",monospace; font-size:11px; font-weight:700; color:var(--ch-color,var(--accent)); margin-bottom:10px; display:inline-block;}
+.q-text{font-size:18px; font-weight:700; margin-bottom:20px; line-height:1.6;}
+.opt-list{display:flex; flex-direction:column; gap:10px;}
+.opt{
+  display:flex; gap:12px; align-items:flex-start;
+  padding:14px 16px;
+  border-radius:12px;
+  border:1.5px solid var(--border);
+  background:var(--surface-2);
+  cursor:pointer;
+  font-size:14.5px;
+  text-align:left;
+}
+.opt:hover{border-color:var(--accent);}
+.opt .opt-letter{
+  font-family:"JetBrains Mono",monospace; font-weight:700; flex:none;
+  width:24px; height:24px; border-radius:50%; background:var(--bg-alt);
+  display:flex; align-items:center; justify-content:center; font-size:12px;
+}
+.opt.correct{border-color:var(--success); background:var(--success-soft);}
+.opt.correct .opt-letter{background:var(--success); color:#fff;}
+.opt.incorrect{border-color:var(--danger); background:var(--danger-soft);}
+.opt.incorrect .opt-letter{background:var(--danger); color:#fff;}
+.opt.disabled{cursor:default;}
+.explain{
+  margin-top:16px; padding:14px 16px; border-radius:12px;
+  background:var(--accent-soft); color:var(--text); font-size:13.5px; line-height:1.7;
+  border-left:3px solid var(--accent);
+}
+.explain b{color:var(--accent-strong);}
+
+.result-hero{
+  text-align:center; padding:34px 20px; background:var(--surface);
+  border:1px solid var(--border); border-radius:18px; margin-bottom:22px;
+}
+.result-score{font-family:"JetBrains Mono",monospace; font-size:52px; font-weight:700; font-variant-numeric:tabular-nums;}
+.result-score span{font-size:22px; color:var(--text-muted);}
+.result-msg{font-size:15px; color:var(--text-muted); margin-top:6px;}
+.chapter-breakdown{display:flex; flex-direction:column; gap:10px; margin:20px 0;}
+.cb-row{display:flex; align-items:center; gap:12px; font-size:13px;}
+.cb-row .cb-name{width:150px; flex:none; color:var(--text-muted);}
+.cb-row .progress-track{flex:1;}
+.cb-row .cb-pct{width:42px; text-align:right; font-family:"JetBrains Mono",monospace; font-weight:700;}
+.review-list{display:flex; flex-direction:column; gap:12px;}
+.review-item{background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:14px 16px;}
+.review-item .rq{font-weight:700; font-size:14px; margin-bottom:8px;}
+.review-item .ra{font-size:13px; color:var(--text-muted); display:flex; gap:6px;}
+.review-item .ra b{color:var(--text);}
+.review-item .ra.wrong b{color:var(--danger);}
+.review-item .ra.right b{color:var(--success);}
+
+/* ============ GLOSSARY ============ */
+.search-box{
+  display:flex; align-items:center; gap:10px;
+  border:1px solid var(--border); background:var(--surface);
+  border-radius:12px; padding:10px 14px; margin-bottom:18px;
+}
+.search-box svg{width:17px;height:17px; stroke:var(--text-faint); flex:none;}
+.search-box input{
+  border:none; outline:none; background:none; color:var(--text); font-size:14.5px; width:100%;
+  font-family:inherit;
+}
+.gloss-group{margin-bottom:26px;}
+.gloss-group h3{
+  font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:.06em;
+  color:var(--gc,var(--accent)); margin-bottom:10px;
+}
+.gloss-item{
+  padding:14px 0; border-bottom:1px solid var(--border);
+}
+.gloss-item:last-child{border-bottom:none;}
+.gloss-item dt{font-weight:700; font-size:14.5px; margin-bottom:4px;}
+.gloss-item dd{margin:0; font-size:13.5px; color:var(--text-muted);}
+.gloss-item.status-mastered dt{color:var(--success);}
+.gloss-item.status-review dt{color:var(--danger);}
+.gloss-subgroup{margin:0 0 24px;}
+.gloss-subgroup:last-child{margin-bottom:0;}
+.gloss-cat-title{
+  display:flex; align-items:center; gap:8px;
+  font-size:15px; font-weight:900; color:var(--text);
+  background:var(--surface-2);
+  border-left:5px solid var(--gc,var(--accent));
+  padding:10px 14px; border-radius:8px; margin:0 0 10px;
+}
+.gloss-cat-title .cat-count{
+  margin-left:auto; font-size:11.5px; font-weight:700; color:var(--text-muted);
+  background:var(--surface); border:1px solid var(--border); border-radius:999px; padding:2px 9px;
+  flex:none;
+}
+.gloss-subgroup .gloss-item{padding-left:6px;}
+.empty-note{color:var(--text-faint); font-size:13.5px; padding:20px 0;}
+
+/* ============ Chapter context label ============ */
+.chapter-context{
+  font-size:14px; font-weight:800; color:var(--accent);
+  margin:-8px 0 18px;
+}
+.chapter-context .ctx-sub{color:var(--text-muted); font-weight:600; font-size:13px; margin-left:2px;}
+
+/* ============ Card/List segmented toggle ============ */
+.seg-toggle{display:inline-flex; gap:4px; background:var(--surface-2); padding:4px; border-radius:12px; margin-bottom:18px;}
+.seg-btn{border:none; background:none; padding:8px 18px; border-radius:9px; font-size:13.5px; font-weight:700; color:var(--text-muted); cursor:pointer; font-family:inherit;}
+.seg-btn.active{background:var(--surface); color:var(--accent); box-shadow:0 1px 4px rgba(0,0,0,.10);}
+
+/* ============ Bottom tab bar (mobile) ============ */
+.tabbar{
+  display:none;
+  background:var(--surface);
+  border-top:1px solid var(--border);
+  padding:6px 4px calc(6px + env(safe-area-inset-bottom));
+}
+.tabbar-row{display:flex;}
+.tabbar .nav-item{
+  flex-direction:column; align-items:center; gap:2px; font-size:10.5px; flex:1; padding:6px 2px; border-radius:10px;
+}
+
+@media (max-width: 860px){
+  #app{flex-direction:column;}
+  .sidebar{display:none;}
+  .tabbar{display:block;}
+  .main{padding:22px 16px 26px;}
+  .stat-row{grid-template-columns:repeat(2,1fr);}
+  .chapter-grid{grid-template-columns:1fr;}
+  .cb-row .cb-name{width:96px; font-size:12px;}
+}
+@media (max-width:480px){
+  .fc-term{font-size:21px;}
+  .flashcard{min-height:250px;}
+  .flashcard-inner{min-height:250px;}
+}
+
+/* ============ VOCAB ADDITIONS ============ */
+[hidden]{display:none !important;}
+.chapter-card{color:var(--text);font:inherit;}
+.chapter-card h3{font-family:"Zen Kaku Gothic New","Noto Sans JP",sans-serif;}
+.opt{color:var(--text);font-family:inherit;}
+.inp{width:100%; border:1px solid var(--border); background:var(--surface); color:var(--text); border-radius:10px; padding:9px 12px; font:inherit; font-size:14.5px; outline:none;}
+.inp:focus{border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-soft);}
+select.inp{width:auto; padding:7px 10px; font-size:13.5px; font-weight:700;}
+.btn-sm{padding:7px 12px; font-size:12.5px; border-radius:8px;}
+.btn-ghost.danger{color:var(--danger);}
+.btn-ghost.danger:hover{border-color:var(--danger); color:var(--danger);}
+.chapter-card.add-card{--ch-color:var(--border); align-items:center; justify-content:center; border-style:dashed; color:var(--text-muted); font-weight:700; font-size:15px; min-height:132px; background:transparent;}
+.chapter-card.add-card:hover{border-color:var(--accent); color:var(--accent);}
+.chapter-card.add-card::before{display:none;}
+.ch-last{font-size:11.5px; font-weight:700; color:var(--text-muted);}
+.ch-last.good{color:var(--success);}
+.ch-last.bad{color:var(--danger);}
+.panel + .panel{margin-top:16px;}
+.tip{font-size:12.5px; color:var(--text-faint); line-height:1.7; margin:14px 0 0;}
+.opt-row{display:flex; gap:10px 20px; flex-wrap:wrap; align-items:center; margin:2px 0 16px; font-size:13.5px; color:var(--text-muted);}
+.opt-row label{display:flex; align-items:center; gap:8px; cursor:pointer; font-weight:700;}
+.opt-row input[type=checkbox]{width:16px; height:16px; accent-color:var(--accent);}
+.empty-box{background:var(--surface); border:1px dashed var(--border); border-radius:16px; padding:26px 20px; text-align:center; color:var(--text-muted); font-size:14px;}
+.empty-box .btn{margin-top:14px;}
+
+/* word rows */
+.wrow{display:flex; gap:8px; align-items:center; padding:7px 0; border-bottom:1px solid var(--border);}
+.wrow:last-child{border-bottom:none;}
+.wrow .wr-no{width:30px; flex:none; text-align:right; font-family:"JetBrains Mono",monospace; font-size:11px; color:var(--text-faint);}
+.wr-fields{flex:1; min-width:0; display:grid; grid-template-columns:1fr 1.5fr; gap:8px;}
+.wrow.warn{background:var(--warning-soft); border-radius:10px; padding-left:8px; padding-right:6px;}
+.wrow.dup{opacity:.6;}
+.wrow input[type=checkbox]{width:18px; height:18px; accent-color:var(--accent); flex:none;}
+.tag-mini{font-size:10.5px; font-weight:700; border-radius:999px; padding:2px 8px; flex:none; white-space:nowrap;}
+.tag-warn{background:var(--warning-soft); color:var(--warning); border:1px solid var(--warning);}
+.tag-dup{background:var(--bg-alt); color:var(--text-muted);}
+.x-btn{width:32px; height:32px; border:none; background:none; color:var(--text-faint); border-radius:8px; cursor:pointer; font-size:20px; line-height:1; flex:none;}
+.x-btn:hover{color:var(--danger); background:var(--danger-soft);}
+.review-head{display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; margin:20px 0 6px; padding-top:18px; border-top:1px solid var(--border);}
+.review-head b{font-size:15px;}
+.review-foot{display:flex; gap:10px; flex-wrap:wrap; margin-top:16px;}
+.ocr-msg-err{color:var(--danger);}
+details.raw{margin-top:14px; font-size:12.5px; color:var(--text-muted);}
+details.raw pre{white-space:pre-wrap; background:var(--surface-2); border-radius:10px; padding:12px; max-height:220px; overflow:auto; font-size:12px;}
+
+.sel-bar{display:flex; align-items:center; gap:12px; flex-wrap:wrap; padding:2px 0 10px; border-bottom:1px solid var(--border); margin-bottom:8px;}
+.sel-all{display:flex; align-items:center; gap:8px; font-size:13.5px; font-weight:700; color:var(--text-muted); cursor:pointer;}
+.sel-all input{width:18px; height:18px; accent-color:var(--accent);}
+.sel-count{font-size:13px; color:var(--accent); font-weight:700; flex:1;}
+.btn:disabled{opacity:.4; cursor:not-allowed;}
+.inp.invalid{border-color:var(--danger); background:var(--danger-soft);}
+
+/* flashcard tweaks */
+.fc-en{font-size:34px; font-weight:900; font-family:"Zen Kaku Gothic New","Noto Sans JP",sans-serif; word-break:break-word; line-height:1.25;}
+.fc-ja{font-size:22px; font-weight:800; font-family:"Zen Kaku Gothic New","Noto Sans JP",sans-serif; line-height:1.5;}
+.fc-en-sm{font-size:14px; color:var(--text-muted); font-weight:700;}
+.speak-btn{width:36px; height:36px;}
+.speak-btn svg{width:16px; height:16px;}
+.fl-row{display:flex; justify-content:space-between; align-items:center; gap:14px; padding:12px 6px 12px 10px; border-bottom:1px solid var(--border); border-left:4px solid transparent;}
+.fl-row.status-mastered{border-left-color:var(--success);}
+.fl-row.status-review{border-left-color:var(--danger);}
+.fl-en{font-weight:800; font-size:16px; display:flex; align-items:center; gap:8px; flex:none; max-width:48%; word-break:break-word;}
+.fl-ja{color:var(--text-muted); font-size:14.5px; text-align:right; padding:2px 6px; border-radius:6px;}
+.fl-ja.q{color:var(--text); font-weight:800; font-size:16px; text-align:left;}
+.fl-en.a{font-weight:600; font-size:14.5px; color:var(--text-muted); justify-content:flex-end; text-align:right;}
+.fl-en.a.fl-ans{padding:2px 6px; border-radius:6px;}
+.hide-ans .fl-ans:not(.revealed){color:transparent; background:var(--bg-alt); user-select:none; cursor:pointer;}
+
+.toggle-row{display:flex; gap:10px 14px; flex-wrap:wrap; align-items:center;}
+.toggle-row .seg-toggle{margin-bottom:18px;}
+.fc-en.ja{font-size:28px;}
+
+/* quiz tweaks */
+.q-word{font-size:32px; font-weight:900; font-family:"Zen Kaku Gothic New","Noto Sans JP",sans-serif; display:flex; align-items:center; gap:12px; margin-bottom:6px; word-break:break-word;}
+.q-sub{font-size:13px; color:var(--text-muted); margin-bottom:18px;}
+.q-next{margin-top:16px; display:flex; justify-content:flex-end;}
+.count-note{font-size:13px; color:var(--text-muted); margin:12px 0 0;}
+
+/* dialog + toast */
+dialog{border:1px solid var(--border); border-radius:16px; background:var(--surface); color:var(--text); padding:22px; width:min(92vw,420px);}
+dialog::backdrop{background:rgba(10,15,30,.5);}
+dialog h3{font-size:17px; margin-bottom:12px;}
+dialog .btn-row{margin-top:16px; justify-content:flex-end;}
+.toast{position:fixed; left:50%; bottom:96px; transform:translateX(-50%); width:max-content; background:var(--text); color:var(--bg); padding:10px 18px; border-radius:999px; font-size:13.5px; font-weight:700; z-index:99; opacity:0; pointer-events:none; transition:opacity .25s; max-width:90vw; text-align:center;}
+.toast.show{opacity:1;}
+@media (max-width:860px){
+  .tabbar{position:fixed; left:0; right:0; bottom:0; z-index:20;}
+  .tabbar-row{flex-direction:row;}
+  .main{padding-bottom:96px;}
+}
+@media (max-width:560px){
+  .opt-row label.sel-label{flex-direction:column; align-items:flex-start; width:100%;}
+  select.inp{width:100%;}
+  .wr-fields{grid-template-columns:1fr;}
+  .fc-en{font-size:28px;}
+  .q-word{font-size:26px;}
+  .fl-en{max-width:52%;}
+}
+</style>
+</head>
+<body>
+
+<div id="app">
+  <!-- ===== Sidebar ===== -->
+  <nav class="sidebar" aria-label="メインナビゲーション">
+    <div class="brand">
+      <span class="brand-badge">WORDS</span>
+      <span class="brand-name">英単語 攻略ラボ</span>
+    </div>
+    <div class="nav" id="nav-desktop"></div>
+    <div class="sidebar-foot">進捗はこのブラウザに保存されます</div>
+  </nav>
+
+  <main class="main">
+    <!-- ===== HOME ===== -->
+    <section class="view" id="view-home">
+      <div class="page-head">
+        <span class="eyebrow">Dashboard</span>
+        <h1>週テスト対策</h1>
+        <p>1回のテスト範囲を「章」にして、単語帳の写真から単語を取り込みましょう。</p>
+      </div>
+
+      <div class="stat-row">
+        <div class="stat-card"><div class="num mono" id="stat-mastered">0</div><div class="lbl">覚えた単語</div></div>
+        <div class="stat-card"><div class="num mono" id="stat-total">0</div><div class="lbl">総単語数</div></div>
+        <div class="stat-card"><div class="num mono" id="stat-chapters">0</div><div class="lbl">章の数</div></div>
+        <div class="stat-card"><div class="num mono" id="stat-avg">–</div><div class="lbl">テスト平均正答率</div></div>
+      </div>
+
+      <div class="setup-label">章から始める</div>
+      <div class="chapter-grid" id="chapter-grid"></div>
+    </section>
+
+    <!-- ===== CHAPTER DETAIL ===== -->
+    <section class="view" id="view-chapter" hidden>
+      <button class="btn btn-ghost btn-sm" id="ch-back">&larr; 章の一覧へ</button>
+      <div class="page-head" style="margin-top:16px;">
+        <span class="eyebrow" id="ch-eyebrow">Chapter</span>
+        <h1 id="ch-title">章</h1>
+        <p id="ch-sub"></p>
+      </div>
+      <div class="btn-row" style="margin-bottom:8px;">
+        <button class="btn btn-primary" id="ch-study">カードで学習</button>
+        <button class="btn btn-primary" id="ch-test">この章をテスト</button>
+        <button class="btn btn-ghost" id="ch-rename">章名を変更</button>
+        <button class="btn btn-ghost danger" id="ch-delete">章を削除</button>
+      </div>
+
+      <div class="setup-label">写真から単語を追加</div>
+      <div class="panel">
+        <p class="data-panel-note">単語帳のページを撮影して選ぶと、左の英単語と、赤字の日本語の意味だけを読み取ります(黒字の例文や派生語は取り込みません)。複数枚をまとめて選べて、あとから何度でも追加できます。追加する前に、読み取り結果を確認・修正できます。</p>
+        <div class="opt-row">
+          <label class="sel-label">読み取りモード
+            <select class="inp" id="ocr-mode">
+              <option value="red">赤字の意味だけ (左の英単語 + 赤い日本語)</option>
+              <option value="3">汎用: 英単語と意味が同じ行にある本 (自動)</option>
+              <option value="6">汎用: 表形式のページ (1ブロック)</option>
+            </select>
+          </label>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-primary" id="ocr-pick-btn">写真を選ぶ</button>
+          <button class="btn btn-ghost" id="ocr-cam-btn">カメラで撮影</button>
+        </div>
+        <input type="file" id="ocr-file" accept="image/*" multiple hidden>
+        <input type="file" id="ocr-camera" accept="image/*" capture="environment" hidden>
+        <div id="ocr-status" hidden style="margin-top:16px;">
+          <div class="data-panel-note" id="ocr-status-text" style="margin-bottom:8px;"></div>
+          <div class="progress-track" style="--ch-color:var(--accent);"><div class="progress-fill" id="ocr-bar" style="width:0%"></div></div>
+        </div>
+        <div id="ocr-review"></div>
+        <p class="tip">撮影のコツ: 明るい場所で、影が入らないよう真上から1ページずつ撮ると精度が上がります。初回は読み取り用データ(数MB)のダウンロードで少し時間がかかりますが、2回目以降は速くなります。</p>
+      </div>
+
+      <div class="setup-label">1語ずつ手入力で追加</div>
+      <div class="panel">
+        <div class="wr-fields" style="grid-template-columns:1fr 1.5fr auto; align-items:center;">
+          <input class="inp" id="man-en" placeholder="英単語 (例: apple)" autocapitalize="off" autocomplete="off" spellcheck="false">
+          <input class="inp" id="man-ja" placeholder="意味 (例: りんご)" autocomplete="off">
+          <button class="btn btn-ghost" id="man-add">追加</button>
+        </div>
+      </div>
+
+      <div class="setup-label" id="ch-words-label">単語一覧</div>
+      <div class="panel" id="ch-words"></div>
+    </section>
+
+    <!-- ===== FLASHCARDS ===== -->
+    <section class="view" id="view-flash" hidden>
+      <div class="page-head">
+        <span class="eyebrow">Flashcards</span>
+        <h1>単語カード</h1>
+        <p>カードをタップして答えを確認し、覚えたかどうかを記録しましょう。表面は英語・日本語で切り替えられます。</p>
+      </div>
+      <div class="pill-row" id="flash-chapter-pills"></div>
+      <div class="chapter-context" id="flash-chapter-title"></div>
+      <div class="opt-row">
+        <label><input type="checkbox" id="flash-only-new"> 未習得の単語だけ</label>
+        <label><input type="checkbox" id="flash-shuffle"> シャッフル</label>
+      </div>
+      <div class="toggle-row">
+        <div class="seg-toggle" id="flash-dir-toggle" aria-label="カードの表面">
+          <button class="seg-btn active" data-dir="en">英語 → 日本語</button>
+          <button class="seg-btn" data-dir="ja">日本語 → 英語</button>
+        </div>
+        <div class="seg-toggle" id="flash-mode-toggle">
+          <button class="seg-btn active" data-mode="card">カード</button>
+          <button class="seg-btn" data-mode="list">一覧</button>
+        </div>
+      </div>
+
+      <div id="fc-empty" class="empty-box" hidden></div>
+
+      <div class="fc-wrap" id="fc-wrap">
+        <div class="fc-progress">
+          <span class="mono" id="fc-count">0 / 0</span>
+          <div class="progress-track"><div class="progress-fill" id="fc-progress-fill" style="width:0%"></div></div>
+          <span class="mono" id="fc-mastered-count">覚えた 0</span>
+        </div>
+        <div class="flashcard" id="flashcard" tabindex="0">
+          <div class="flashcard-inner" id="flashcard-inner">
+            <div class="fc-face front">
+              <div class="fc-top-row"><span class="fc-tag" id="fc-tag-front">章</span></div>
+              <div class="fc-en" id="fc-front-main">–</div>
+              <button class="iconbtn speak-btn" id="fc-speak" title="発音を聞く" aria-label="発音を聞く"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M19 5a10 10 0 0 1 0 14"/></svg></button>
+              <div class="fc-hint" id="fc-hint-front">タップして意味を見る</div>
+            </div>
+            <div class="fc-face back">
+              <div class="fc-top-row"><span class="fc-tag" id="fc-tag-back">章</span></div>
+              <div class="fc-en-sm" id="fc-back-sub">–</div>
+              <div class="fc-ja" id="fc-back-main">–</div>
+              <button class="iconbtn speak-btn" id="fc-speak-back" title="発音を聞く" aria-label="発音を聞く" hidden><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M19 5a10 10 0 0 1 0 14"/></svg></button>
+              <div class="fc-hint">タップしてもう一度</div>
+            </div>
+          </div>
+        </div>
+        <div class="fc-controls">
+          <button class="iconbtn" id="fc-prev" title="前へ" aria-label="前へ"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+          <button class="status-btn review" id="fc-mark-review">もう一度</button>
+          <button class="status-btn mastered" id="fc-mark-mastered">覚えた</button>
+          <button class="iconbtn" id="fc-reset" title="判定をリセット" aria-label="判定をリセット"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg></button>
+          <button class="iconbtn" id="fc-next" title="次へ" aria-label="次へ"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></button>
+        </div>
+      </div>
+
+      <div id="fc-list-wrap" hidden>
+        <div class="opt-row"><label><input type="checkbox" id="flash-hide-ja"> 答えを隠す (タップで表示)</label></div>
+        <div id="fc-list"></div>
+      </div>
+    </section>
+
+    <!-- ===== QUIZ ===== -->
+    <section class="view" id="view-quiz" hidden>
+      <div class="page-head">
+        <span class="eyebrow">Test</span>
+        <h1>単語テスト</h1>
+        <p>英単語を見て、正しい日本語の意味を4つの選択肢から選びます。</p>
+      </div>
+
+      <div id="quiz-setup" class="quiz-setup panel">
+        <div id="quiz-wrong-panel"></div>
+        <div class="setup-label" style="margin-top:0;">出題する章 (複数選べます)</div>
+        <div class="pill-row" id="quiz-chapter-pills"></div>
+        <div class="setup-label">出題数</div>
+        <div class="pill-row" id="quiz-count-pills"></div>
+        <p class="count-note" id="quiz-count-note"></p>
+        <div class="btn-row" style="margin-top:16px;">
+          <button class="btn btn-primary" id="quiz-start-btn">テストを開始</button>
+        </div>
+      </div>
+
+      <div id="quiz-play" hidden></div>
+      <div id="quiz-result" hidden></div>
+    </section>
+
+    <!-- ===== WORDS ===== -->
+    <section class="view" id="view-words" hidden>
+      <div class="page-head">
+        <span class="eyebrow">Word List</span>
+        <h1>単語一覧</h1>
+        <p id="words-sub">登録した単語を章別に一覧できます。</p>
+      </div>
+      <div class="search-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        <input type="text" id="words-search" placeholder="英単語・意味を検索">
+      </div>
+      <div class="pill-row" id="words-chapter-pills"></div>
+      <div id="words-list"></div>
+    </section>
+
+    <!-- ===== SETTINGS ===== -->
+    <section class="view" id="view-settings" hidden>
+      <div class="page-head">
+        <span class="eyebrow">Settings</span>
+        <h1>管理</h1>
+        <p>クラウド同期とデータのバックアップは、ここでまとめて操作します。</p>
+      </div>
+
+      <div class="setup-label">クラウド同期 (Firebase)</div>
+      <div class="panel" id="cloud-panel"></div>
+
+      <div class="setup-label">データのバックアップ</div>
+      <div class="panel data-panel">
+        <p class="data-panel-note">章・単語・進捗はこの端末のブラウザに保存されています(写真そのものは保存しません)。別の端末で使いたい場合は、ここで書き出し・読み込みができます。</p>
+        <div class="btn-row">
+          <button class="btn btn-ghost" id="data-export-btn">データを書き出す</button>
+          <button class="btn btn-ghost" id="data-import-btn">データを読み込む</button>
+          <input type="file" id="data-import-file" accept="application/json" hidden>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ===== Mobile tab bar ===== -->
+  <nav class="tabbar" aria-label="モバイルナビゲーション">
+    <div class="nav tabbar-row" id="nav-mobile"></div>
+  </nav>
+</div>
+
+<dialog id="dlg-chapter">
+  <h3 id="dlg-title">章を追加</h3>
+  <input class="inp" id="dlg-input" maxlength="40" placeholder="例: 第3回 Unit 5-6" autocomplete="off">
+  <div class="btn-row">
+    <button class="btn btn-ghost" id="dlg-cancel" type="button">キャンセル</button>
+    <button class="btn btn-primary" id="dlg-ok" type="button">保存</button>
+  </div>
+</dialog>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+"use strict";
+
+/* ============================================================
+   BASICS
+   ============================================================ */
+function $(id){ return document.getElementById(id); }
+function esc(s){
+  return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){
+    return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
+  });
+}
+function shuffle(arr){
+  var a = arr.slice();
+  for(var i=a.length-1;i>0;i--){
+    var j = Math.floor(Math.random()*(i+1));
+    var t=a[i]; a[i]=a[j]; a[j]=t;
+  }
+  return a;
+}
+function uid(p){ return p + Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+var toastTimer = null;
+function toast(msg){
+  var t = $("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){ t.classList.remove("show"); }, 2600);
+}
+var ICON_SPEAKER = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M19 5a10 10 0 0 1 0 14"/></svg>';
+function speak(text){
+  try{
+    if(!window.speechSynthesis) return;
+    window.speechSynthesis.cancel();
+    var u = new SpeechSynthesisUtterance(text);
+    u.lang = "en-US";
+    u.rate = 0.9;
+    window.speechSynthesis.speak(u);
+  }catch(e){}
+}
+
+/* ============================================================
+   NAV
+   ============================================================ */
+var NAV = [
+  {id:"home", label:"ホーム", icon:'<path d="M3 11l9-7 9 7"/><path d="M5 9.5V21h14V9.5"/>'},
+  {id:"flash", label:"カード", icon:'<rect x="3" y="6" width="14" height="10" rx="2"/><path d="M7 3h14v10"/>'},
+  {id:"quiz", label:"テスト", icon:'<circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 0 1 5 0c0 1.7-2.5 2-2.5 4"/><circle cx="12" cy="17" r=".6" fill="currentColor" stroke="none"/>'},
+  {id:"words", label:"単語一覧", icon:'<path d="M5 4h11a2 2 0 0 1 2 2v14l-6-3-6 3V6a2 2 0 0 1 2-2z"/><path d="M9 8h6M9 11h6"/>'},
+  {id:"settings", label:"管理", icon:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>'}
+];
+var VIEWS = ["home","chapter","flash","quiz","words","settings"];
+var curView = "home";
+
+function buildNav(){
+  ["nav-desktop","nav-mobile"].forEach(function(cid){
+    var box = $(cid);
+    NAV.forEach(function(n){
+      var b = document.createElement("button");
+      b.className = "nav-item";
+      b.dataset.nav = n.id;
+      b.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'+n.icon+'</svg><span>'+n.label+'</span>';
+      b.addEventListener("click", function(){ show(n.id); });
+      box.appendChild(b);
+    });
+  });
+}
+function show(v){
+  curView = v;
+  VIEWS.forEach(function(id){ $("view-"+id).hidden = (id !== v); });
+  var navId = (v === "chapter") ? "home" : v;
+  document.querySelectorAll(".nav-item").forEach(function(b){
+    b.classList.toggle("active", b.dataset.nav === navId);
+  });
+  window.scrollTo(0,0);
+  if(v === "home") renderHome();
+  else if(v === "chapter") renderChapter();
+  else if(v === "flash") renderFlash();
+  else if(v === "quiz") renderQuizSetup();
+  else if(v === "words") renderWords();
+  else if(v === "settings") renderCloudPanel();
+}
+function refreshAllViews(){ show(curView); }
+
+/* ============================================================
+   STATE / STORAGE
+   ============================================================ */
+var STORE_KEY = "vocab_study_progress_v1";
+function emptyState(){ return {chapters:[], words:[], cards:{}, quizHistory:{}, wrongIds:{}, updatedAt:0}; }
+function normalizeState(s){
+  var e = emptyState();
+  if(!s || typeof s !== "object") return e;
+  e.chapters = Array.isArray(s.chapters) ? s.chapters : [];
+  e.words = Array.isArray(s.words) ? s.words : [];
+  e.cards = (s.cards && typeof s.cards === "object") ? s.cards : {};
+  e.quizHistory = (s.quizHistory && typeof s.quizHistory === "object") ? s.quizHistory : {};
+  e.wrongIds = (s.wrongIds && typeof s.wrongIds === "object") ? s.wrongIds : {};
+  e.updatedAt = Number(s.updatedAt) || 0;
+  return e;
+}
+function loadState(){
+  try{
+    var raw = localStorage.getItem(STORE_KEY);
+    if(raw) return normalizeState(JSON.parse(raw));
+  }catch(e){}
+  return emptyState();
+}
+var state = loadState();
+function saveState(){
+  state.updatedAt = Date.now();
+  try{ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }catch(e){}
+  scheduleCloudPush();
+}
+function isStateEmpty(s){ return !s.chapters.length && !s.words.length; }
+
+/* ---- helpers ---- */
+function chapterById(id){
+  for(var i=0;i<state.chapters.length;i++){ if(state.chapters[i].id === id) return state.chapters[i]; }
+  return null;
+}
+function chapterIndex(id){
+  for(var i=0;i<state.chapters.length;i++){ if(state.chapters[i].id === id) return i; }
+  return 0;
+}
+function chapterColor(ch){ return "var(--ch"+(((ch.color||0)%6)+1)+")"; }
+function wordsOf(chId){ return state.words.filter(function(w){ return w.ch === chId; }); }
+function wordById(id){
+  for(var i=0;i<state.words.length;i++){ if(state.words[i].id === id) return state.words[i]; }
+  return null;
+}
+function masteredCount(list){
+  var n = 0;
+  list.forEach(function(w){ if(state.cards[w.id] === "mastered") n++; });
+  return n;
+}
+function lastTest(chId){
+  var h = state.quizHistory[chId];
+  return (h && h.length) ? h[h.length-1] : null;
+}
+function pct(c, n){ return n ? Math.round(c/n*100) : 0; }
+
+/* ============================================================
+   CHAPTER DIALOG
+   ============================================================ */
+var dlgMode = "add";
+function openChapterDialog(mode){
+  dlgMode = mode;
+  var ch = (mode === "rename") ? chapterById(curCh) : null;
+  $("dlg-title").textContent = (mode === "rename") ? "章名を変更" : "章を追加";
+  $("dlg-input").value = ch ? ch.title : "";
+  $("dlg-input").placeholder = "例: 第"+(state.chapters.length+1)+"回 Unit "+(state.chapters.length*2+1)+"-"+(state.chapters.length*2+2);
+  var d = $("dlg-chapter");
+  if(d.showModal) d.showModal(); else d.setAttribute("open","");
+  setTimeout(function(){ $("dlg-input").focus(); }, 30);
+}
+function closeChapterDialog(){
+  var d = $("dlg-chapter");
+  if(d.close) d.close(); else d.removeAttribute("open");
+}
+function submitChapterDialog(){
+  var title = $("dlg-input").value.trim();
+  if(!title){ $("dlg-input").focus(); return; }
+  if(dlgMode === "rename"){
+    var ch = chapterById(curCh);
+    if(ch){ ch.title = title; saveState(); }
+    closeChapterDialog();
+    renderChapter();
+  }else{
+    var nc = {id:uid("c"), title:title, color:state.chapters.length % 6, photos:0, created:Date.now()};
+    state.chapters.push(nc);
+    saveState();
+    closeChapterDialog();
+    toast("章を追加しました。写真か手入力で単語を追加しましょう");
+    openChapter(nc.id);
+  }
+}
+$("dlg-ok").addEventListener("click", submitChapterDialog);
+$("dlg-cancel").addEventListener("click", closeChapterDialog);
+$("dlg-input").addEventListener("keydown", function(e){
+  if(e.key === "Enter"){ e.preventDefault(); submitChapterDialog(); }
+});
+
+/* ============================================================
+   HOME
+   ============================================================ */
+function renderHome(){
+  var total = state.words.length;
+  $("stat-mastered").textContent = masteredCount(state.words);
+  $("stat-total").textContent = total;
+  $("stat-chapters").textContent = state.chapters.length;
+  var ps = [];
+  state.chapters.forEach(function(ch){
+    var t = lastTest(ch.id);
+    if(t) ps.push(pct(t.c, t.n));
+  });
+  $("stat-avg").textContent = ps.length ? Math.round(ps.reduce(function(a,b){return a+b;},0)/ps.length)+"%" : "–";
+
+  var grid = $("chapter-grid");
+  var html = "";
+  state.chapters.forEach(function(ch, i){
+    var ws = wordsOf(ch.id);
+    var m = masteredCount(ws);
+    var t = lastTest(ch.id);
+    var lastHtml = "";
+    if(t){
+      var p = pct(t.c, t.n);
+      lastHtml = '<span class="ch-last '+(p>=80?"good":(p<60?"bad":""))+'">前回 '+p+'%</span>';
+    }else{
+      lastHtml = '<span class="ch-last">未テスト</span>';
+    }
+    html += '<button class="chapter-card" data-ch="'+esc(ch.id)+'" style="--ch-color:'+chapterColor(ch)+'">'+
+      '<div class="ch-top"><span class="ch-num">'+(i+1)+'</span>'+lastHtml+'</div>'+
+      '<h3>'+esc(ch.title)+'</h3>'+
+      '<div class="progress-track"><div class="progress-fill" style="width:'+pct(m, ws.length)+'%"></div></div>'+
+      '<div class="ch-meta"><span>'+ws.length+'語</span><span>覚えた '+m+' / '+ws.length+'</span></div>'+
+    '</button>';
+  });
+  html += '<button class="chapter-card add-card" id="add-chapter-card">＋ 章を追加</button>';
+  grid.innerHTML = html;
+}
+$("chapter-grid").addEventListener("click", function(e){
+  var add = e.target.closest("#add-chapter-card");
+  if(add){ openChapterDialog("add"); return; }
+  var card = e.target.closest(".chapter-card[data-ch]");
+  if(card) openChapter(card.dataset.ch);
+});
+
+/* ============================================================
+   CHAPTER DETAIL
+   ============================================================ */
+var curCh = null;
+function openChapter(id){
+  if(curCh !== id){ resetOcr(); chSel = {}; }
+  curCh = id;
+  show("chapter");
+}
+function renderChapter(){
+  var ch = chapterById(curCh);
+  if(!ch){ show("home"); return; }
+  $("ch-eyebrow").textContent = "Chapter " + (chapterIndex(ch.id)+1);
+  $("ch-title").textContent = ch.title;
+  var ws = wordsOf(ch.id);
+  $("ch-sub").textContent = ws.length + "語" + (ch.photos ? " ・ 写真 " + ch.photos + "枚から読み込み済み" : "");
+  $("ch-words-label").textContent = "単語一覧 (" + ws.length + "語)";
+  renderChapterWords();
+  renderReview();
+}
+var chSel = {};   // selected word ids in the chapter word list
+function renderChapterWords(){
+  var ws = wordsOf(curCh);
+  var box = $("ch-words");
+  // forget selections of words that no longer exist
+  var alive = {};
+  ws.forEach(function(w){ alive[w.id] = true; });
+  Object.keys(chSel).forEach(function(id){ if(!alive[id]) delete chSel[id]; });
+  if(!ws.length){
+    box.innerHTML = '<div class="empty-box" style="border:none;padding:10px;">まだ単語がありません。上の「写真を選ぶ」か手入力で追加してください。</div>';
+    return;
+  }
+  var html = '<div class="sel-bar">'+
+    '<label class="sel-all"><input type="checkbox" id="ch-sel-all" aria-label="すべて選択"> すべて選択</label>'+
+    '<span class="sel-count" id="ch-sel-count"></span>'+
+    '<button class="btn btn-ghost danger btn-sm" id="ch-del-sel">選択した単語を削除</button>'+
+    '</div><p class="tip" style="margin:0 0 6px;">英単語・意味の欄は直接タップして編集できます(自動で保存されます)。</p>';
+  ws.forEach(function(w, i){
+    html += '<div class="wrow" data-id="'+esc(w.id)+'">'+
+      '<input type="checkbox" data-f="sel" aria-label="選択"'+(chSel[w.id]?" checked":"")+'>'+
+      '<span class="wr-no">'+(i+1)+'</span>'+
+      '<div class="wr-fields">'+
+        '<input class="inp" data-f="en" value="'+esc(w.en)+'" autocapitalize="off" spellcheck="false" aria-label="英単語">'+
+        '<input class="inp" data-f="ja" value="'+esc(w.ja)+'" aria-label="意味">'+
+      '</div>'+
+      '<button class="x-btn" data-act="del" title="この単語を削除" aria-label="この単語を削除">×</button>'+
+    '</div>';
+  });
+  box.innerHTML = html;
+  updateSelBar();
+}
+function updateSelBar(){
+  var n = Object.keys(chSel).length, total = wordsOf(curCh).length;
+  var cnt = $("ch-sel-count"), del = $("ch-del-sel"), all = $("ch-sel-all");
+  if(!cnt) return;
+  cnt.textContent = n ? (n + "語を選択中") : "";
+  del.disabled = !n;
+  all.checked = total > 0 && n === total;
+  all.indeterminate = n > 0 && n < total;
+}
+var editTimer = null;
+$("ch-words").addEventListener("input", function(e){
+  var inp = e.target;
+  if(!inp.dataset || (inp.dataset.f !== "en" && inp.dataset.f !== "ja")) return;
+  var w = wordById(inp.closest(".wrow").dataset.id);
+  if(!w) return;
+  var v = inp.value.trim();
+  inp.classList.toggle("invalid", !v);
+  if(!v) return;                       // never save an empty value
+  w[inp.dataset.f] = v;
+  clearTimeout(editTimer);
+  editTimer = setTimeout(saveState, 500);
+});
+$("ch-words").addEventListener("change", function(e){
+  var inp = e.target;
+  if(!inp.dataset) return;
+  if(inp.dataset.f === "sel"){
+    var id = inp.closest(".wrow").dataset.id;
+    if(inp.checked) chSel[id] = true; else delete chSel[id];
+    updateSelBar();
+    return;
+  }
+  if(inp.id === "ch-sel-all"){
+    chSel = {};
+    if(inp.checked) wordsOf(curCh).forEach(function(w){ chSel[w.id] = true; });
+    $("ch-words").querySelectorAll("input[data-f=sel]").forEach(function(c){ c.checked = inp.checked; });
+    updateSelBar();
+    return;
+  }
+  if(inp.dataset.f === "en" || inp.dataset.f === "ja"){   // left empty -> restore the saved value
+    var w = wordById(inp.closest(".wrow").dataset.id);
+    if(w){ inp.value = w[inp.dataset.f]; inp.classList.remove("invalid"); }
+  }
+});
+$("ch-words").addEventListener("click", function(e){
+  if(e.target.closest("#ch-del-sel")){
+    var ids = Object.keys(chSel);
+    if(!ids.length) return;
+    if(!confirm(ids.length + "語を削除しますか？学習記録も一緒に削除されます。")) return;
+    chSel = {};
+    removeWords(ids);
+    renderChapter();
+    toast(ids.length + "語を削除しました");
+    return;
+  }
+  var btn = e.target.closest("[data-act=del]");
+  if(!btn) return;
+  var id = btn.closest(".wrow").dataset.id;
+  delete chSel[id];
+  removeWords([id]);
+  renderChapter();
+});
+function removeWords(ids){
+  var set = {};
+  ids.forEach(function(i){ set[i] = true; delete state.cards[i]; delete state.wrongIds[i]; });
+  state.words = state.words.filter(function(w){ return !set[w.id]; });
+  saveState();
+}
+$("ch-back").addEventListener("click", function(){ show("home"); });
+$("ch-study").addEventListener("click", function(){ flash.ch = curCh; show("flash"); });
+$("ch-test").addEventListener("click", function(){
+  quiz.sel = {}; quiz.sel[curCh] = true;
+  show("quiz");
+});
+$("ch-rename").addEventListener("click", function(){ openChapterDialog("rename"); });
+$("ch-delete").addEventListener("click", function(){
+  var ch = chapterById(curCh);
+  if(!ch) return;
+  var n = wordsOf(ch.id).length;
+  if(!confirm("「"+ch.title+"」を削除しますか？\n登録済みの"+n+"語と学習記録も削除されます。この操作は取り消せません。")) return;
+  removeWords(wordsOf(ch.id).map(function(w){ return w.id; }));
+  state.chapters = state.chapters.filter(function(c){ return c.id !== ch.id; });
+  delete state.quizHistory[ch.id];
+  saveState();
+  curCh = null;
+  resetOcr();
+  toast("章を削除しました");
+  show("home");
+});
+
+/* ---- manual add ---- */
+function manualAdd(){
+  var en = $("man-en").value.trim();
+  var ja = $("man-ja").value.trim();
+  if(!en || !ja){ toast("英単語と意味の両方を入力してください"); return; }
+  var exists = wordsOf(curCh).some(function(w){ return w.en.trim().toLowerCase() === en.toLowerCase(); });
+  if(exists){ toast("「"+en+"」はこの章に登録済みです"); return; }
+  state.words.push({id:uid("w"), ch:curCh, en:en, ja:ja});
+  saveState();
+  $("man-en").value = ""; $("man-ja").value = "";
+  $("man-en").focus();
+  renderChapter();
+}
+$("man-add").addEventListener("click", manualAdd);
+["man-en","man-ja"].forEach(function(id){
+  $(id).addEventListener("keydown", function(e){
+    if(e.key === "Enter"){ e.preventDefault(); manualAdd(); }
+  });
+});
+
+/* ============================================================
+   OCR: PHOTO -> WORD LIST  (Tesseract.js, runs in the browser)
+   ============================================================ */
+var TESS_SRC = "https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js";
+var ocrWorkers = {};   // kind -> Promise<worker>
+var WORKER_LANGS = {jpn:["jpn"], eng:["eng"], engjpn:["eng","jpn"]};
+var ocrLogger = null;
+var ocrBusy = false;
+var ocrRows = [];      // {id,en,ja,checked,warn,dup}
+var ocrRaw = [];       // raw OCR text per photo
+var ocrPhotos = 0;     // photos processed in this review session
+var ocrMsg = "";
+
+function resetOcr(){
+  ocrRows = []; ocrRaw = []; ocrPhotos = 0; ocrMsg = "";
+  var st = $("ocr-status"); if(st) st.hidden = true;
+  var rv = $("ocr-review"); if(rv) rv.innerHTML = "";
+}
+
+function loadScriptTag(src){
+  return new Promise(function(resolve, reject){
+    var s = document.createElement("script");
+    s.src = src;
+    s.onload = function(){ resolve(); };
+    s.onerror = function(){ reject(new Error("読み取りエンジンを読み込めませんでした。通信状況を確認してください。")); };
+    document.head.appendChild(s);
+  });
+}
+function getWorker(kind){
+  if(ocrWorkers[kind]) return ocrWorkers[kind];
+  ocrWorkers[kind] = (window.Tesseract ? Promise.resolve() : loadScriptTag(TESS_SRC)).then(function(){
+    return window.Tesseract.createWorker(WORKER_LANGS[kind], 1, {
+      logger: function(m){ if(ocrLogger) ocrLogger(m); }
+    });
+  }).catch(function(err){ delete ocrWorkers[kind]; throw err; });
+  return ocrWorkers[kind];
+}
+
+/* ---- image preprocessing: orientation fix, resize, grayscale, contrast stretch ---- */
+function loadBitmap(file){
+  if(window.createImageBitmap){
+    return createImageBitmap(file, {imageOrientation:"from-image"}).catch(function(){ return createImageBitmap(file); });
+  }
+  return new Promise(function(resolve, reject){
+    var img = new Image();
+    var url = URL.createObjectURL(file);
+    img.onload = function(){ URL.revokeObjectURL(url); resolve(img); };
+    img.onerror = function(){ reject(new Error("画像を読み込めませんでした")); };
+    img.src = url;
+  });
+}
+/* ---- OCR text -> [{en, ja, warn}] ---- */
+var JA_CLASS = "\\u3040-\\u30ff\\u3400-\\u4dbf\\u4e00-\\u9fff\\uff01-\\uff60\\uff66-\\uff9f\\u3001\\u3002\\u300c-\\u300f\\u30fb\\u301c\\uff5e";
+var RE_JA_CHAR = new RegExp("["+JA_CLASS+"]");
+var RE_JA_GAP = new RegExp("(["+JA_CLASS+"])[ \\t\\u3000]+(?=["+JA_CLASS+"])", "g");
+
+function isLatin(ch){ return (ch >= "A" && ch <= "Z") || (ch >= "a" && ch <= "z"); }
+function cleanJa(s){
+  s = s.replace(/　/g, " ");
+  s = s.replace(RE_JA_GAP, "$1");          // OCR often inserts spaces between kana/kanji
+  s = s.replace(/\s+[\d.)\]】]+\s*$/, ""); // trailing entry numbers from the next column
+  s = s.replace(/^[\s|｜:：\-–—=＝•●■□◆◇▶▷]+/, "");
+  s = s.replace(/[\s|｜'’"“”°*·•\-–—]+$/, "");
+  return s.trim();
+}
+var SHORT_OK = /^(a|i|an|as|at|be|by|do|go|if|in|is|it|me|my|no|of|on|or|so|to|up|us|we|am|he|hi|oh|ok)$/i;
+function cleanEn(s){
+  s = s.replace(/\[[^\]]*\]/g, "");        // pronunciation like [ǽpl]
+  s = s.replace(/\s+/g, " ").trim();
+  s = s.replace(/\s*\((?:n|v|adj|adv|prep|conj|pron|vt|vi)\.?\)\s*$/i, "");
+  s = s.replace(/[\s|｜:：,;\-–—=＝•●■□◆◇▶▷]+$/, "");
+  // entry numbers misread as letters ("11" -> "ug"): drop a leading 1-2 letter token that is not a real short word
+  var m = s.match(/^([A-Za-z]{1,2})\s+(\S.{3,})$/);
+  if(m && !SHORT_OK.test(m[1])) s = m[2];
+  return s.trim();
+}
+/* Rebuild text rows from word bounding boxes. Tesseract's layout analysis often splits a
+   "word | meaning" table into separate English / Japanese blocks, so we regroup by y-position. */
+function rowsFromWords(words){
+  var ws = [];
+  (words || []).forEach(function(w){
+    if(!w || !w.text || !String(w.text).trim() || !w.bbox) return;
+    if(typeof w.confidence === "number" && w.confidence < 25) return;
+    ws.push({t:String(w.text).trim(), x0:w.bbox.x0, yc:(w.bbox.y0 + w.bbox.y1)/2, h:(w.bbox.y1 - w.bbox.y0)});
+  });
+  if(!ws.length) return null;
+  var hs = ws.map(function(w){ return w.h; }).sort(function(a,b){ return a-b; });
+  var med = hs[hs.length >> 1] || 20;
+  ws.sort(function(a,b){ return a.yc - b.yc; });
+  var rows = [];
+  ws.forEach(function(w){
+    var r = rows[rows.length-1];
+    if(r && Math.abs(w.yc - r.yc) <= med*0.6){
+      r.items.push(w);
+      r.yc = (r.yc*(r.items.length-1) + w.yc) / r.items.length;
+    }else rows.push({yc:w.yc, items:[w]});
+  });
+  return rows.map(function(r){
+    return r.items.sort(function(a,b){ return a.x0 - b.x0; }).map(function(w){ return w.t; }).join(" ");
+  });
+}
+function wordsFromResult(data){
+  if(data && data.words && data.words.length) return data.words;
+  var out = [];
+  ((data && data.blocks) || []).forEach(function(b){
+    (b.paragraphs || []).forEach(function(p){
+      (p.lines || []).forEach(function(l){ (l.words || []).forEach(function(w){ out.push(w); }); });
+    });
+  });
+  return out;
+}
+function parseOcrText(text){ return parseLines(String(text || "").split(/\r?\n/)); }
+function parseLines(lines){
+  var pairs = [], rowNo = 0;
+  lines.forEach(function(raw){
+    var line = raw.replace(/\[[^\]]*\]/g, " ");
+    if(!line.trim()) return;
+    var runs = [], cur = null;
+    for(var i=0;i<line.length;i++){
+      var ch = line.charAt(i);
+      var t = isLatin(ch) ? "E" : (RE_JA_CHAR.test(ch) ? "J" : null);
+      if(t === null){ if(cur) cur.s += ch; continue; }
+      if(!cur || cur.t !== t){ cur = {t:t, s:""}; runs.push(cur); }
+      cur.s += ch;
+    }
+    if(!runs.length) return;
+    var idx = 0, colNo = 0;
+    rowNo++;
+    // meaning wrapped onto its own line: attach to the previous entry
+    if(runs[0].t === "J"){
+      if(pairs.length && runs.length === 1){
+        var extra = cleanJa(runs[0].s);
+        if(extra) pairs[pairs.length-1].ja += extra;
+      }
+      idx = 1;
+    }
+    for(; idx < runs.length; idx++){
+      if(runs[idx].t !== "E") continue;
+      var nxt = runs[idx+1];
+      if(nxt && nxt.t === "J"){
+        pairs.push({en:cleanEn(runs[idx].s), ja:cleanJa(nxt.s), col:colNo++, row:rowNo});
+        idx++;
+      }
+    }
+  });
+  // multi-column pages: keep the book's order (column by column) instead of row by row
+  var multi = pairs.filter(function(p){ return p.col > 0; }).length;
+  if(pairs.length && multi >= pairs.length*0.3){
+    pairs = pairs.map(function(p, i){ p.i = i; return p; }).sort(function(a,b){ return (a.col - b.col) || (a.i - b.i); });
+  }
+  var out = [];
+  pairs.forEach(function(p){
+    if(!p.en || !p.ja) return;
+    var words = p.en.split(" ").length;
+    var warn = words > 5 || /[.?!]$/.test(p.en) || /[0-9,;]/.test(p.en) || p.ja.length > 40 || (p.en.length < 2 && !/^[aI]$/.test(p.en));
+    out.push({en:p.en, ja:p.ja, warn:warn});
+  });
+  return out;
+}
+
+/* ---- image loading: colour canvas (needed to pick out red text) ---- */
+function loadColorCanvas(file){
+  return loadBitmap(file).then(function(bmp){
+    var w = bmp.width, h = bmp.height;
+    var longSide = Math.max(w, h);
+    var scale = 1;
+    if(longSide > 2400) scale = 2400 / longSide;
+    else if(longSide < 1600) scale = Math.min(2, 1600 / longSide);
+    var cw = Math.round(w*scale), ch = Math.round(h*scale);
+    var cv = document.createElement("canvas");
+    cv.width = cw; cv.height = ch;
+    var ctx = cv.getContext("2d", {willReadFrequently:true});
+    ctx.fillStyle = "#fff"; ctx.fillRect(0,0,cw,ch);
+    ctx.drawImage(bmp, 0, 0, cw, ch);
+    if(bmp.close) bmp.close();
+    return cv;
+  });
+}
+
+/* ---- RED MODE ------------------------------------------------------------
+   For books laid out as: [English headword | RED Japanese meaning + black extras].
+   1) build an image where only red pixels are dark, and OCR it -> the red meanings
+   2) for every red line, crop the area to its left, binarise it locally and OCR it as one line -> headword */
+function makeRedMask(cv){
+  var w = cv.width, h = cv.height;
+  var src = cv.getContext("2d", {willReadFrequently:true}).getImageData(0,0,w,h).data;
+  var out = document.createElement("canvas");
+  out.width = w; out.height = h;
+  var octx = out.getContext("2d");
+  var im = octx.createImageData(w, h), d = im.data;
+  for(var i=0;i<src.length;i+=4){
+    var r = src[i], g = src[i+1], b = src[i+2];
+    var mg = g > b ? g : b;
+    var red = (r - mg) / 255;
+    var v = 255;
+    if(red > 0.14 && r > 89){
+      var mn = g < b ? g : b, dd = r - mn;
+      var hue = ((g - b) / dd) * 60; if(hue < 0) hue += 360;
+      if(hue < 18 || hue > 342){
+        var s = (red - 0.14) / 0.20; if(s > 1) s = 1;
+        v = 255 - Math.round(s*255);
+      }
+    }
+    d[i] = d[i+1] = d[i+2] = v; d[i+3] = 255;
+  }
+  octx.putImageData(im, 0, 0);
+  return out;
+}
+var RE_PUNCT_ONLY = /^[()（）、，；;,.。・〜~\-]+$/;
+function redRowsFromWords(words){
+  var ws = [];
+  (words || []).forEach(function(w){
+    if(!w || !w.text || !w.bbox) return;
+    var t = String(w.text).trim();
+    if(!t) return;
+    if(typeof w.confidence === "number" && w.confidence < 20) return;
+    var ja = RE_JA_CHAR.test(t);
+    if(!ja && !RE_PUNCT_ONLY.test(t)) return;
+    ws.push({t:t, ja:ja, x0:w.bbox.x0, x1:w.bbox.x1, y0:w.bbox.y0, y1:w.bbox.y1});
+  });
+  var jaWs = ws.filter(function(w){ return w.ja; });
+  if(!jaWs.length) return [];
+  var hs = jaWs.map(function(w){ return w.y1 - w.y0; }).sort(function(a,b){ return a-b; });
+  var med = hs[hs.length >> 1] || 30;
+  // drop furigana / specks: small in BOTH directions (a thin "一" is wide, so it survives)
+  ws = ws.filter(function(w){ return !((w.y1 - w.y0) < 0.6*med && (w.x1 - w.x0) < 0.6*med); });
+  ws.forEach(function(w){ w.yc = (w.y0 + w.y1) / 2; });
+  ws.sort(function(a,b){ return a.yc - b.yc; });
+  var rows = [];
+  ws.forEach(function(w){
+    var r = rows[rows.length-1];
+    if(r && Math.abs(w.yc - r.yc) <= 0.7*med){
+      r.items.push(w);
+      r.yc = (r.yc*(r.items.length-1) + w.yc) / r.items.length;
+    }else rows.push({yc:w.yc, items:[w]});
+  });
+  var out = [];
+  rows.forEach(function(r){
+    if(!r.items.some(function(w){ return w.ja; })) return;
+    r.items.sort(function(a,b){ return a.x0 - b.x0; });
+    var s = "", prev = null;
+    r.items.forEach(function(w){
+      if(prev && (w.x0 - prev.x1) > 0.8*med && !RE_PUNCT_ONLY.test(w.t) && !RE_PUNCT_ONLY.test(prev.t)) s += "、";
+      s += w.t; prev = w;
+    });
+    out.push({yc:r.yc, x0:r.items[0].x0, text:cleanJa(s), med:med});
+  });
+  // keep only rows in the main meaning column (drops the little circled marks in the left column)
+  var xs = out.map(function(o){ return o.x0; }).sort(function(a,b){ return a-b; });
+  var mx0 = xs[xs.length >> 1];
+  return out.filter(function(o){ return o.text && Math.abs(o.x0 - mx0) <= 6*med; });
+}
+var HEADWORD_WL = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-' ";
+function headwordCanvas(cv, row){
+  var med = row.med;
+  var x = Math.max(0, Math.round(row.x0 - 13*med));
+  var xr = Math.round(row.x0 - 0.65*med);
+  var y = Math.max(0, Math.round(row.yc - 1.15*med));
+  var yb = Math.min(cv.height, Math.round(row.yc + 0.75*med));
+  var w = xr - x, h = yb - y;
+  if(w < 20 || h < 10) return null;
+  var SC = 2, cw = w*SC, ch = h*SC;
+  var t = document.createElement("canvas");
+  t.width = cw; t.height = ch;
+  var ctx = t.getContext("2d", {willReadFrequently:true});
+  ctx.imageSmoothingQuality = "high";
+  ctx.fillStyle = "#fff"; ctx.fillRect(0,0,cw,ch);
+  ctx.drawImage(cv, x, y, w, h, 0, 0, cw, ch);
+  var im = ctx.getImageData(0,0,cw,ch), d = im.data;
+  var gray = new Float32Array(cw*ch);
+  for(var p=0, i=0; p<gray.length; p++, i+=4){
+    var r = d[i], g = d[i+1], b = d[i+2];
+    var mx = r > g ? (r > b ? r : b) : (g > b ? g : b);
+    var mn = r < g ? (r < b ? r : b) : (g < b ? g : b);
+    var sat = (mx - mn) / (mx + 1e-6);
+    gray[p] = (sat > 0.35 && mx > 102) ? 255 : (0.299*r + 0.587*g + 0.114*b);   // blue rules / red marks -> white
+  }
+  // integral image -> local mean threshold (copes with shadows and the bright page edge)
+  var W1 = cw + 1, I = new Float64Array(W1*(ch+1));
+  for(var yy=0; yy<ch; yy++){
+    var rs = 0;
+    for(var xx=0; xx<cw; xx++){
+      rs += gray[yy*cw + xx];
+      I[(yy+1)*W1 + xx+1] = I[yy*W1 + xx+1] + rs;
+    }
+  }
+  var R = Math.max(8, Math.round(med*0.52));
+  for(var y2=0; y2<ch; y2++){
+    var ya = Math.max(0, y2-R), yb2 = Math.min(ch, y2+R+1);
+    for(var x2=0; x2<cw; x2++){
+      var xa = Math.max(0, x2-R), xb = Math.min(cw, x2+R+1);
+      var S = I[yb2*W1 + xb] - I[ya*W1 + xb] - I[yb2*W1 + xa] + I[ya*W1 + xa];
+      var mean = S / ((yb2-ya)*(xb-xa));
+      var v = gray[y2*cw + x2] < mean*0.80 ? 0 : 255;
+      var o = (y2*cw + x2)*4;
+      d[o] = d[o+1] = d[o+2] = v; d[o+3] = 255;
+    }
+  }
+  ctx.putImageData(im, 0, 0);
+  return t;
+}
+function cleanHeadword(s){
+  s = String(s || "").replace(/[^A-Za-z'\- ]/g, " ").replace(/\s+/g, " ").trim();
+  var toks = s.split(" ").filter(Boolean);
+  // stray 1-2 letter specks before the real word
+  while(toks.length > 1 && toks[0].length <= 2 && !SHORT_OK.test(toks[0]) && toks[1].length >= 3) toks.shift();
+  return toks.join(" ").replace(/^[-']+|[-']+$/g, "");
+}
+function processRedPhoto(worker, engWorker, file, idx, n){
+  var base = idx / n, span = 1 / n;
+  var colorCv = null, rows = [];
+  setOcrStatus("写真 "+(idx+1)+" / "+n+" を準備中…", base);
+  return loadColorCanvas(file).then(function(cv){
+    colorCv = cv;
+    setOcrStatus("写真 "+(idx+1)+" / "+n+": 赤字の意味を探しています…", base + span*0.05);
+    return worker.setParameters({tessedit_pageseg_mode:"6", tessedit_char_whitelist:"", preserve_interword_spaces:"1"});
+  }).then(function(){
+    return worker.recognize(makeRedMask(colorCv), {}, {text:true, blocks:true});
+  }).then(function(res){
+    rows = redRowsFromWords(wordsFromResult((res && res.data) || {}));
+    if(!rows.length) return [];
+    return engWorker.setParameters({tessedit_pageseg_mode:"7", tessedit_char_whitelist:HEADWORD_WL}).then(function(){
+      var out = [], chain = Promise.resolve();
+      rows.forEach(function(row, k){
+        chain = chain.then(function(){
+          setOcrStatus("写真 "+(idx+1)+" / "+n+": 英単語を読み取り中… "+(k+1)+" / "+rows.length, base + span*(0.2 + 0.8*k/rows.length));
+          var cv = headwordCanvas(colorCv, row);
+          if(!cv){ out.push({en:"", ja:row.text}); return; }
+          return engWorker.recognize(cv).then(function(r2){
+            out.push({en:cleanHeadword(r2 && r2.data && r2.data.text), ja:row.text});
+          });
+        });
+      });
+      return chain.then(function(){ return out; });
+    });
+  }).then(function(pairs){
+    var lines = pairs.map(function(p){ return (p.en || "(?)") + "  |  " + p.ja; });
+    if(!pairs.length) lines = ["(赤字の日本語が見つかりませんでした)"];
+    return {pairs:pairs, lines:lines};
+  });
+}
+
+/* ---- generic mode: [English  meaning] on one line, any colour ---- */
+function grayStretch(src){
+  var cw = src.width, ch = src.height;
+  var cv = document.createElement("canvas");
+  cv.width = cw; cv.height = ch;
+  var ctx = cv.getContext("2d", {willReadFrequently:true});
+  ctx.drawImage(src, 0, 0);
+  var im = ctx.getImageData(0,0,cw,ch), d = im.data;
+  var hist = new Uint32Array(256);
+  for(var i=0;i<d.length;i+=4){
+    var g = (d[i]*299 + d[i+1]*587 + d[i+2]*114)/1000 | 0;
+    d[i] = g; hist[g]++;
+  }
+  var totalPx = cw*ch, acc = 0, lo = 0, hi = 255;
+  for(var a=0;a<256;a++){ acc += hist[a]; if(acc >= totalPx*0.01){ lo = a; break; } }
+  acc = 0;
+  for(var b=255;b>=0;b--){ acc += hist[b]; if(acc >= totalPx*0.01){ hi = b; break; } }
+  if(hi - lo < 30){ lo = 0; hi = 255; }
+  var range = hi - lo;
+  for(var k=0;k<d.length;k+=4){
+    var v = (d[k]-lo)*255/range;
+    v = v < 0 ? 0 : (v > 255 ? 255 : v);
+    d[k] = d[k+1] = d[k+2] = v;
+    d[k+3] = 255;
+  }
+  ctx.putImageData(im, 0, 0);
+  return cv;
+}
+function processGenericPhoto(worker, file, idx, n, psm){
+  setOcrStatus("写真 "+(idx+1)+" / "+n+" を準備中…", idx/n);
+  return loadColorCanvas(file).then(function(cv){
+    return worker.setParameters({tessedit_pageseg_mode:psm, tessedit_char_whitelist:"", preserve_interword_spaces:"1"}).then(function(){
+      setOcrStatus("写真 "+(idx+1)+" / "+n+" を読み取り中…", idx/n);
+      return worker.recognize(grayStretch(cv), {}, {text:true, blocks:true});
+    });
+  }).then(function(res){
+    var data = (res && res.data) || {};
+    var rows = rowsFromWords(wordsFromResult(data));
+    var lines = rows || String(data.text || "").split(/\r?\n/);
+    return {pairs:parseLines(lines), lines:lines};
+  });
+}
+
+/* ---- run OCR on selected photos ---- */
+function setOcrStatus(text, frac, isErr){
+  var box = $("ocr-status");
+  box.hidden = false;
+  var t = $("ocr-status-text");
+  t.textContent = text;
+  t.className = "data-panel-note" + (isErr ? " ocr-msg-err" : "");
+  $("ocr-bar").style.width = Math.round((frac||0)*100) + "%";
+}
+function setOcrBusyUI(){
+  ["ocr-pick-btn","ocr-cam-btn"].forEach(function(id){ $(id).disabled = ocrBusy; });
+}
+function handleFiles(fileList){
+  if(ocrBusy) return;
+  var files = Array.prototype.slice.call(fileList || []).filter(function(f){
+    return /^image\//.test(f.type) || /\.(heic|heif|jpe?g|png|webp)$/i.test(f.name);
+  });
+  if(!files.length) return;
+  ocrBusy = true; setOcrBusyUI();
+  var n = files.length, chapterAtStart = curCh;
+  var mode = $("ocr-mode").value;
+  var before = ocrRows.length;
+  setOcrStatus("読み取りエンジンを準備中… (初回は言語データのダウンロードに時間がかかります)", 0.02);
+  ocrLogger = function(m){
+    if(/loading|initializ/.test(m.status || "")){
+      setOcrStatus("読み取り用データを準備中… (初回のみ) "+Math.round((m.progress||0)*100)+"%", 0.02);
+    }
+  };
+  var need = (mode === "red") ? Promise.all([getWorker("jpn"), getWorker("eng")]) : getWorker("engjpn").then(function(w){ return [w]; });
+  need.then(function(ws){
+    var worker = ws[0], engWorker = ws[1];
+    var chain = Promise.resolve();
+    files.forEach(function(file, i){
+      chain = chain.then(function(){
+        var p = (mode === "red") ? processRedPhoto(worker, engWorker, file, i, n) : processGenericPhoto(worker, file, i, n, mode);
+        return p.then(function(res){
+          if(chapterAtStart !== curCh) return;   // user switched chapter meanwhile
+          ocrRaw.push(res.lines.join("\n"));
+          ocrPhotos++;
+          res.pairs.forEach(function(r){
+            var warn = (mode === "red") ? (!r.en || r.en.length < 2) : !!r.warn;
+            ocrRows.push({id:uid("o"), en:r.en, ja:r.ja, warn:warn, checked:!warn, dup:false});
+          });
+        });
+      });
+    });
+    return chain;
+  }).then(function(){
+    markDups();
+    var found = ocrRows.length - before;
+    if(!found){
+      setOcrStatus(mode === "red"
+        ? "赤字の日本語が見つかりませんでした。明るい場所で撮り直すか、読み取りモードを「汎用」に切り替えてお試しください。"
+        : "単語を検出できませんでした。", 0, true);
+    }else{
+      setOcrStatus("読み取り完了: "+found+"語を検出しました。内容を確認して「追加する」を押してください。", 1);
+    }
+  }).catch(function(err){
+    console.error(err);
+    setOcrStatus("読み取りに失敗しました: "+(err && err.message ? err.message : err), 0, true);
+  }).then(function(){
+    ocrBusy = false; ocrLogger = null; setOcrBusyUI(); renderReview();
+  });
+}
+
+["ocr-file","ocr-camera"].forEach(function(id){
+  $(id).addEventListener("change", function(e){ handleFiles(e.target.files); e.target.value = ""; });
+});
+$("ocr-pick-btn").addEventListener("click", function(){ $("ocr-file").click(); });
+$("ocr-cam-btn").addEventListener("click", function(){ $("ocr-camera").click(); });
+
+/* ---- review list ---- */
+function markDups(){
+  var exist = {};
+  wordsOf(curCh).forEach(function(w){ exist[w.en.trim().toLowerCase()] = true; });
+  var seen = {};
+  ocrRows.forEach(function(r){
+    var k = r.en.trim().toLowerCase();
+    if(exist[k] || seen[k]){ r.dup = true; r.checked = false; }
+    else r.dup = false;
+    seen[k] = true;
+  });
+}
+function renderReview(){
+  var box = $("ocr-review");
+  if(!box) return;
+  if(!ocrRows.length){
+    if(ocrRaw.length){
+      box.innerHTML = '<div class="review-head"><b>単語を検出できませんでした</b></div>'+
+        '<p class="data-panel-note">「英単語＋日本語の意味」が並んだ部分が見つかりませんでした。明るい場所で真上から撮り直すか、読み取りモードを切り替えてお試しください。手入力での追加も使えます。</p>'+
+        rawDetailsHTML();
+    }else box.innerHTML = "";
+    return;
+  }
+  var html = '<div class="review-head"><b id="review-count"></b>'+
+    '<div class="btn-row"><button class="btn btn-ghost btn-sm" id="rv-all">すべて選択</button>'+
+    '<button class="btn btn-ghost btn-sm" id="rv-none">すべて解除</button></div></div>'+
+    '<p class="data-panel-note" style="margin:0 0 6px;">読み間違いはその場で直せます。黄色の行は文章の可能性があり、「登録済み」は同じ英単語がこの章にあるため、最初は選択されていません。</p>';
+  ocrRows.forEach(function(r, i){
+    html += '<div class="wrow'+(r.warn?" warn":"")+(r.dup?" dup":"")+'" data-i="'+i+'">'+
+      '<input type="checkbox" data-f="chk"'+(r.checked?" checked":"")+' aria-label="追加する">'+
+      '<div class="wr-fields">'+
+        '<input class="inp" data-f="en" value="'+esc(r.en)+'" autocapitalize="off" spellcheck="false" aria-label="英単語">'+
+        '<input class="inp" data-f="ja" value="'+esc(r.ja)+'" aria-label="意味">'+
+      '</div>'+
+      (r.dup ? '<span class="tag-mini tag-dup">登録済み</span>' : (r.warn ? '<span class="tag-mini tag-warn">要確認</span>' : ''))+
+      '<button class="x-btn" data-act="del" title="この行を削除" aria-label="この行を削除">×</button>'+
+    '</div>';
+  });
+  html += '<div class="review-foot"><button class="btn btn-primary" id="rv-add">選択した単語を章に追加</button>'+
+    '<button class="btn btn-ghost" id="rv-row">行を追加</button>'+
+    '<button class="btn btn-ghost" id="rv-clear">読み取り結果を破棄</button></div>'+
+    rawDetailsHTML();
+  box.innerHTML = html;
+  updateReviewCount();
+}
+function rawDetailsHTML(){
+  if(!ocrRaw.length) return "";
+  return '<details class="raw"><summary>読み取った生のテキストを見る</summary><pre>'+esc(ocrRaw.join("\n----- 次の写真 -----\n"))+'</pre></details>';
+}
+function updateReviewCount(){
+  var el = $("review-count");
+  if(!el) return;
+  var sel = ocrRows.filter(function(r){ return r.checked && r.en.trim() && r.ja.trim(); }).length;
+  el.textContent = "検出 "+ocrRows.length+"語 ・ 追加する "+sel+"語";
+  var btn = $("rv-add");
+  if(btn) btn.disabled = !sel;
+}
+$("ocr-review").addEventListener("input", function(e){
+  var el = e.target;
+  if(!el.dataset || !el.dataset.f || el.dataset.f === "chk") return;
+  var row = el.closest(".wrow");
+  if(!row) return;
+  var r = ocrRows[Number(row.dataset.i)];
+  if(r){ r[el.dataset.f] = el.value; updateReviewCount(); }
+});
+$("ocr-review").addEventListener("change", function(e){
+  var el = e.target;
+  if(el.dataset && el.dataset.f === "chk"){
+    var r = ocrRows[Number(el.closest(".wrow").dataset.i)];
+    if(r){ r.checked = el.checked; updateReviewCount(); }
+  }
+});
+$("ocr-review").addEventListener("click", function(e){
+  var t = e.target;
+  if(t.closest("[data-act=del]")){
+    ocrRows.splice(Number(t.closest(".wrow").dataset.i), 1);
+    renderReview(); return;
+  }
+  if(t.id === "rv-all"){ ocrRows.forEach(function(r){ r.checked = true; }); renderReview(); return; }
+  if(t.id === "rv-none"){ ocrRows.forEach(function(r){ r.checked = false; }); renderReview(); return; }
+  if(t.id === "rv-row"){ ocrRows.push({id:uid("o"), en:"", ja:"", warn:false, checked:true, dup:false}); renderReview(); return; }
+  if(t.id === "rv-clear"){
+    if(confirm("読み取り結果を破棄しますか？(追加済みの単語には影響しません)")){ resetOcr(); }
+    return;
+  }
+  if(t.id === "rv-add"){ commitReview(); return; }
+});
+function commitReview(){
+  var ch = chapterById(curCh);
+  if(!ch) return;
+  var exist = {};
+  wordsOf(curCh).forEach(function(w){ exist[w.en.trim().toLowerCase()] = true; });
+  var added = 0, skipped = 0;
+  ocrRows.forEach(function(r){
+    if(!r.checked) return;
+    var en = r.en.trim(), ja = r.ja.trim();
+    if(!en || !ja) return;
+    var k = en.toLowerCase();
+    if(exist[k]){ skipped++; return; }
+    exist[k] = true;
+    state.words.push({id:uid("w"), ch:curCh, en:en, ja:ja});
+    added++;
+  });
+  if(ocrPhotos > 0) ch.photos = (ch.photos || 0) + ocrPhotos;
+  saveState();
+  resetOcr();
+  renderChapter();
+  toast(added + "語を追加しました" + (skipped ? "(重複"+skipped+"語はスキップ)" : ""));
+}
+
+/* ============================================================
+   FLASHCARDS
+   ============================================================ */
+var flash = {ch:null, mode:"card", dir:"en", onlyNew:false, shuffle:false, hide:false, deck:[], idx:0, flipped:false};
+try{ if(localStorage.getItem("vocab_flash_dir") === "ja") flash.dir = "ja"; }catch(e){}
+
+function renderChapterPills(boxId, selCh, withAll, onPick, isMulti, selMap){
+  var box = $(boxId);
+  var html = "";
+  if(withAll){
+    var allActive = isMulti ? (state.chapters.length && state.chapters.every(function(c){ return selMap[c.id]; })) : selCh === 0;
+    html += '<button class="pill'+(allActive?" active":"")+'" data-ch="0">全章</button>';
+  }
+  state.chapters.forEach(function(c, i){
+    var active = isMulti ? !!selMap[c.id] : selCh === c.id;
+    html += '<button class="pill'+(active?" active":"")+'" data-ch="'+esc(c.id)+'">'+(i+1)+'. '+esc(c.title)+'</button>';
+  });
+  box.innerHTML = html;
+  box.onclick = function(e){
+    var b = e.target.closest(".pill");
+    if(b) onPick(b.dataset.ch === "0" ? 0 : b.dataset.ch);
+  };
+}
+function noChaptersBox(el){
+  el.hidden = false;
+  el.innerHTML = 'まだ単語がありません。<br>ホームで章を追加して、単語帳の写真を取り込みましょう。<br><button class="btn btn-primary" id="goto-home">ホームへ</button>';
+  var b = el.querySelector("#goto-home");
+  if(b) b.onclick = function(){ show("home"); };
+}
+function buildDeck(){
+  var ws = flash.ch ? wordsOf(flash.ch) : state.words.slice();
+  if(flash.onlyNew) ws = ws.filter(function(w){ return state.cards[w.id] !== "mastered"; });
+  var ids = ws.map(function(w){ return w.id; });
+  flash.deck = flash.shuffle ? shuffle(ids) : ids;
+  flash.idx = 0;
+  flash.flipped = false;
+}
+function renderFlash(){
+  if(flash.ch === null){
+    flash.ch = curCh || (state.chapters.length ? state.chapters[state.chapters.length-1].id : 0);
+  }
+  if(flash.ch && !chapterById(flash.ch)) flash.ch = 0;
+  $("flash-only-new").checked = flash.onlyNew;
+  $("flash-shuffle").checked = flash.shuffle;
+  $("flash-hide-ja").checked = flash.hide;
+  document.querySelectorAll("#flash-mode-toggle .seg-btn").forEach(function(b){
+    b.classList.toggle("active", b.dataset.mode === flash.mode);
+  });
+  document.querySelectorAll("#flash-dir-toggle .seg-btn").forEach(function(b){
+    b.classList.toggle("active", b.dataset.dir === flash.dir);
+  });
+  renderChapterPills("flash-chapter-pills", flash.ch, true, function(v){
+    flash.ch = v; buildDeck(); renderFlash();
+  }, false);
+  buildDeckIfStale();
+  flash.deck = flash.deck.filter(function(id){ return wordById(id); });
+  if(flash.idx >= flash.deck.length) flash.idx = Math.max(0, flash.deck.length-1);
+  var scopeWords = flash.ch ? wordsOf(flash.ch) : state.words;
+  var title = flash.ch ? (chapterInfoLabel(flash.ch)) : "全章";
+  $("flash-chapter-title").innerHTML = esc(title)+' <span class="ctx-sub">('+scopeWords.length+'語)</span>';
+
+  var empty = $("fc-empty");
+  if(!state.words.length){
+    noChaptersBox(empty);
+    $("fc-wrap").hidden = true; $("fc-list-wrap").hidden = true;
+    return;
+  }
+  if(!flash.deck.length){
+    empty.hidden = false;
+    empty.textContent = flash.onlyNew ? "この範囲の単語はすべて「覚えた」になっています。「未習得の単語だけ」のチェックを外すと復習できます。" : "この範囲にはまだ単語がありません。";
+    $("fc-wrap").hidden = true; $("fc-list-wrap").hidden = true;
+    return;
+  }
+  empty.hidden = true;
+  $("fc-wrap").hidden = (flash.mode !== "card");
+  $("fc-list-wrap").hidden = (flash.mode !== "list");
+  if(flash.mode === "card") renderCard(); else renderFlashList();
+}
+function chapterInfoLabel(id){
+  var c = chapterById(id);
+  return c ? (chapterIndex(id)+1)+". "+c.title : "";
+}
+var deckKey = "";
+function buildDeckIfStale(){
+  var key = [flash.ch, flash.onlyNew, flash.shuffle, state.words.length].join("|");
+  if(key !== deckKey){ deckKey = key; buildDeck(); }
+}
+function currentWord(){ return wordById(flash.deck[flash.idx]); }
+function renderCard(){
+  var w = currentWord();
+  if(!w){ return; }
+  var ch = chapterById(w.ch);
+  var color = ch ? chapterColor(ch) : "var(--accent)";
+  var fc = $("flashcard");
+  fc.style.setProperty("--ch-color", color);
+  fc.classList.toggle("flipped", flash.flipped);
+  var st = state.cards[w.id];
+  fc.classList.remove("status-mastered","status-review");
+  if(st === "mastered") fc.classList.add("status-mastered");
+  if(st === "review") fc.classList.add("status-review");
+  var tag = ch ? (chapterIndex(ch.id)+1)+". "+ch.title : "";
+  $("fc-tag-front").textContent = tag; $("fc-tag-back").textContent = tag;
+  var enFirst = (flash.dir === "en");
+  var q = enFirst ? w.en : w.ja, ans = enFirst ? w.ja : w.en;
+  $("fc-front-main").textContent = q;
+  $("fc-front-main").className = "fc-en" + (enFirst ? "" : " ja");
+  $("fc-back-sub").textContent = q;
+  $("fc-back-main").textContent = ans;
+  $("fc-back-main").className = enFirst ? "fc-ja" : "fc-en";
+  $("fc-speak").hidden = !enFirst;          // never speak the answer on the question side
+  $("fc-speak-back").hidden = enFirst;
+  $("fc-hint-front").textContent = enFirst ? "タップして意味を見る" : "タップして英語を見る";
+  $("fc-count").textContent = (flash.idx+1)+" / "+flash.deck.length;
+  $("fc-progress-fill").style.width = Math.round((flash.idx+1)/flash.deck.length*100)+"%";
+  var m = 0; flash.deck.forEach(function(id){ if(state.cards[id]==="mastered") m++; });
+  $("fc-mastered-count").textContent = "覚えた "+m;
+  $("fc-prev").disabled = flash.idx === 0;
+  $("fc-next").disabled = flash.idx >= flash.deck.length-1;
+  $("fc-mark-review").classList.toggle("is-active", st === "review");
+  $("fc-mark-mastered").classList.toggle("is-active", st === "mastered");
+}
+function goCard(delta){
+  var n = flash.idx + delta;
+  if(n < 0 || n >= flash.deck.length) return;
+  flash.idx = n; flash.flipped = false;
+  renderCard();
+}
+function markCard(status){
+  var w = currentWord();
+  if(!w) return;
+  if(status) state.cards[w.id] = status; else delete state.cards[w.id];
+  saveState();
+  renderCard();
+  if(status && flash.idx < flash.deck.length-1){
+    setTimeout(function(){ goCard(1); }, 220);
+  }
+}
+$("flashcard").addEventListener("click", function(e){
+  if(e.target.closest("#fc-speak, #fc-speak-back")) return;
+  flash.flipped = !flash.flipped;
+  renderCard();
+});
+["fc-speak","fc-speak-back"].forEach(function(id){
+  $(id).addEventListener("click", function(e){
+    e.stopPropagation();
+    var w = currentWord(); if(w) speak(w.en);
+  });
+});
+$("flash-dir-toggle").addEventListener("click", function(e){
+  var b = e.target.closest(".seg-btn");
+  if(!b) return;
+  flash.dir = b.dataset.dir;
+  flash.flipped = false;
+  try{ localStorage.setItem("vocab_flash_dir", flash.dir); }catch(err){}
+  renderFlash();
+});
+$("fc-prev").addEventListener("click", function(){ goCard(-1); });
+$("fc-next").addEventListener("click", function(){ goCard(1); });
+$("fc-mark-review").addEventListener("click", function(){ markCard("review"); });
+$("fc-mark-mastered").addEventListener("click", function(){ markCard("mastered"); });
+$("fc-reset").addEventListener("click", function(){ markCard(null); });
+$("flash-only-new").addEventListener("change", function(e){ flash.onlyNew = e.target.checked; renderFlash(); });
+$("flash-shuffle").addEventListener("change", function(e){ flash.shuffle = e.target.checked; renderFlash(); });
+$("flash-hide-ja").addEventListener("change", function(e){ flash.hide = e.target.checked; renderFlash(); });
+$("flash-mode-toggle").addEventListener("click", function(e){
+  var b = e.target.closest(".seg-btn");
+  if(!b) return;
+  flash.mode = b.dataset.mode;
+  renderFlash();
+});
+function renderFlashList(){
+  var box = $("fc-list");
+  box.className = flash.hide ? "hide-ans" : "";
+  var enFirst = (flash.dir === "en");
+  var html = "";
+  flash.deck.forEach(function(id){
+    var w = wordById(id);
+    if(!w) return;
+    var st = state.cards[w.id];
+    var enHtml = function(cls){ return '<div class="fl-en'+cls+'">'+esc(w.en)+'<button class="iconbtn speak-btn" data-act="speak" aria-label="発音を聞く">'+ICON_SPEAKER+'</button></div>'; };
+    html += '<div class="fl-row'+(st?" status-"+st:"")+'" data-id="'+esc(w.id)+'">'+
+      (enFirst
+        ? enHtml("") + '<div class="fl-ja fl-ans">'+esc(w.ja)+'</div>'
+        : '<div class="fl-ja q">'+esc(w.ja)+'</div>' + enHtml(" a fl-ans"))+
+      '</div>';
+  });
+  box.innerHTML = html;
+}
+$("fc-list").addEventListener("click", function(e){
+  var row = e.target.closest(".fl-row");
+  if(!row) return;
+  if(e.target.closest("[data-act=speak]")){
+    var w = wordById(row.dataset.id); if(w) speak(w.en);
+    return;
+  }
+  var ans = e.target.closest(".fl-ans");
+  if(ans) ans.classList.toggle("revealed");
+});
+document.addEventListener("keydown", function(e){
+  var tag = (e.target && e.target.tagName) || "";
+  if(tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
+  if(curView === "flash" && flash.mode === "card" && flash.deck.length){
+    if(e.key === "ArrowRight"){ goCard(1); }
+    else if(e.key === "ArrowLeft"){ goCard(-1); }
+    else if(e.key === " "){ e.preventDefault(); flash.flipped = !flash.flipped; renderCard(); }
+  }else if(curView === "quiz" && quiz.qs.length && !$("quiz-play").hidden){
+    var q = quiz.qs[quiz.i];
+    if(!q) return;
+    if(!quiz.locked && /^[1-4]$/.test(e.key)){ answerQuiz(Number(e.key)-1); }
+    else if(quiz.locked && (e.key === "Enter" || e.key === " ")){ e.preventDefault(); nextQuiz(); }
+  }
+});
+
+/* ============================================================
+   TEST (English -> Japanese, 4 choices)
+   ============================================================ */
+var quiz = {sel:{}, count:10, mode:"chapters", qs:[], i:0, locked:false, initSel:false};
+var LETTERS = ["A","B","C","D"];
+
+function quizTargets(){
+  return state.words.filter(function(w){ return quiz.sel[w.ch]; });
+}
+function renderQuizSetup(){
+  $("quiz-setup").hidden = false;
+  $("quiz-play").hidden = true;
+  $("quiz-result").hidden = true;
+  // drop stale selections
+  Object.keys(quiz.sel).forEach(function(id){ if(!chapterById(id)) delete quiz.sel[id]; });
+  if(!Object.keys(quiz.sel).length && !quiz.initSel && state.chapters.length){
+    quiz.sel[state.chapters[state.chapters.length-1].id] = true;
+  }
+  quiz.initSel = true;
+
+  var wrongIds = Object.keys(state.wrongIds).filter(function(id){ return wordById(id); });
+  var wp = $("quiz-wrong-panel");
+  if(wrongIds.length){
+    wp.innerHTML = '<div class="wrong-review-box"><div><div class="wrong-review-title">間違えた単語を復習</div>'+
+      '<div class="wrong-review-sub">これまでのテストで間違えた '+wrongIds.length+' 語をまとめて出題します。</div></div>'+
+      '<button class="btn btn-primary" id="quiz-wrong-btn">'+wrongIds.length+'語をテスト</button></div>';
+    $("quiz-wrong-btn").onclick = function(){ startQuiz(wrongIds, "wrong"); };
+  }else wp.innerHTML = "";
+
+  if(!state.chapters.length){
+    $("quiz-chapter-pills").innerHTML = '<div class="empty-box" style="width:100%">まだ章がありません。ホームで章を追加してください。</div>';
+    $("quiz-count-pills").innerHTML = "";
+    $("quiz-count-note").textContent = "";
+    $("quiz-start-btn").disabled = true;
+    return;
+  }
+  renderChapterPills("quiz-chapter-pills", null, true, function(v){
+    if(v === 0){
+      var all = state.chapters.every(function(c){ return quiz.sel[c.id]; });
+      state.chapters.forEach(function(c){ if(all) delete quiz.sel[c.id]; else quiz.sel[c.id] = true; });
+    }else{
+      if(quiz.sel[v]) delete quiz.sel[v]; else quiz.sel[v] = true;
+    }
+    renderQuizSetup();
+  }, true, quiz.sel);
+
+  var total = quizTargets().length;
+  var cp = "";
+  [10,20,30,0].forEach(function(n){
+    cp += '<button class="pill'+(quiz.count===n?" active":"")+'" data-n="'+n+'">'+(n===0?"全部":n+"問")+'</button>';
+  });
+  var cbox = $("quiz-count-pills");
+  cbox.innerHTML = cp;
+  cbox.onclick = function(e){
+    var b = e.target.closest(".pill"); if(!b) return;
+    quiz.count = Number(b.dataset.n); renderQuizSetup();
+  };
+  var actual = (quiz.count === 0 || quiz.count > total) ? total : quiz.count;
+  $("quiz-count-note").textContent = total
+    ? "対象 "+total+"語 ・ 出題 "+actual+"問 (毎回ランダムな順番・選択肢)"
+    : "章を1つ以上選んでください。";
+  $("quiz-start-btn").disabled = total < 2;
+  if(total === 1) $("quiz-count-note").textContent = "テストには2語以上必要です。";
+}
+$("quiz-start-btn").addEventListener("click", function(){
+  var t = quizTargets();
+  startQuiz(t.map(function(w){ return w.id; }), "chapters");
+});
+
+function startQuiz(ids, mode){
+  var targets = ids.map(wordById).filter(Boolean);
+  if(targets.length < 2){ toast("テストには2語以上必要です"); return; }
+  var pool = shuffle(targets);
+  var n = (mode === "wrong" || quiz.count === 0 || quiz.count > pool.length) ? pool.length : quiz.count;
+  pool = pool.slice(0, n);
+  var targetSet = {};
+  targets.forEach(function(w){ targetSet[w.id] = true; });
+  var others = state.words.filter(function(w){ return !targetSet[w.id]; });
+  quiz.mode = mode;
+  quiz.qs = pool.map(function(w){
+    var used = {}; used[w.ja] = true;
+    var picks = [];
+    var sources = [shuffle(targets), shuffle(others)];
+    sources.forEach(function(src){
+      src.forEach(function(c){
+        if(picks.length >= 3 || c.id === w.id || used[c.ja]) return;
+        used[c.ja] = true; picks.push(c);
+      });
+    });
+    var opts = shuffle([w].concat(picks));
+    return {w:w, opts:opts, ci:opts.indexOf(w), picked:null, ok:false};
+  });
+  quiz.i = 0; quiz.locked = false;
+  $("quiz-setup").hidden = true;
+  $("quiz-result").hidden = true;
+  $("quiz-play").hidden = false;
+  window.scrollTo(0,0);
+  renderQuestion();
+}
+function renderQuestion(){
+  var q = quiz.qs[quiz.i];
+  var total = quiz.qs.length;
+  var ch = chapterById(q.w.ch);
+  var okSoFar = quiz.qs.filter(function(x){ return x.ok; }).length;
+  var html = '<div class="q-progress"><span class="mono">Q '+(quiz.i+1)+' / '+total+'</span><span>正解 <b class="mono">'+okSoFar+'</b></span></div>'+
+    '<div class="progress-track" style="margin-bottom:16px;--ch-color:var(--accent)"><div class="progress-fill" style="width:'+Math.round(quiz.i/total*100)+'%"></div></div>'+
+    '<div class="q-card" style="--ch-color:'+(ch?chapterColor(ch):"var(--accent)")+'">'+
+      '<span class="q-tag">'+esc(ch ? (chapterIndex(ch.id)+1)+". "+ch.title : "")+'</span>'+
+      '<div class="q-word"><span>'+esc(q.w.en)+'</span><button class="iconbtn speak-btn" id="q-speak" aria-label="発音を聞く">'+ICON_SPEAKER+'</button></div>'+
+      '<div class="q-sub">この単語の意味はどれですか？(キーボードの 1〜4 でも選べます)</div>'+
+      '<div class="opt-list">';
+  q.opts.forEach(function(o, k){
+    html += '<button class="opt" data-k="'+k+'"><span class="opt-letter">'+LETTERS[k]+'</span><span>'+esc(o.ja)+'</span></button>';
+  });
+  html += '</div><div id="q-feedback"></div></div>'+
+    '<div class="btn-row"><button class="btn btn-ghost btn-sm" id="q-quit">テストをやめる</button></div>';
+  $("quiz-play").innerHTML = html;
+  quiz.locked = false;
+}
+$("quiz-play").addEventListener("click", function(e){
+  if(e.target.closest("#q-speak")){ var q0 = quiz.qs[quiz.i]; if(q0) speak(q0.w.en); return; }
+  if(e.target.closest("#q-quit")){
+    if(confirm("テストを中断しますか？(ここまでの結果は記録されません)")){ renderQuizSetup(); }
+    return;
+  }
+  if(e.target.closest("#q-next")){ nextQuiz(); return; }
+  var opt = e.target.closest(".opt");
+  if(opt && !quiz.locked) answerQuiz(Number(opt.dataset.k));
+});
+function answerQuiz(k){
+  var q = quiz.qs[quiz.i];
+  if(!q || quiz.locked || !q.opts[k]) return;
+  quiz.locked = true;
+  q.picked = k; q.ok = (k === q.ci);
+  var btns = $("quiz-play").querySelectorAll(".opt");
+  btns.forEach(function(b, idx){
+    b.classList.add("disabled");
+    if(idx === q.ci) b.classList.add("correct");
+    else if(idx === k) b.classList.add("incorrect");
+  });
+  var last = quiz.i === quiz.qs.length-1;
+  $("q-feedback").innerHTML = '<div class="explain"><b>'+(q.ok?"正解！":"不正解")+'</b>　'+esc(q.w.en)+' = '+esc(q.w.ja)+'</div>'+
+    '<div class="q-next"><button class="btn btn-primary" id="q-next">'+(last?"結果を見る":"次へ")+'</button></div>';
+}
+function nextQuiz(){
+  if(!quiz.locked) return;
+  if(quiz.i >= quiz.qs.length-1){ finishQuiz(); return; }
+  quiz.i++;
+  renderQuestion();
+  window.scrollTo(0,0);
+}
+function finishQuiz(){
+  var by = {};
+  quiz.qs.forEach(function(q){
+    var c = q.w.ch;
+    if(!by[c]) by[c] = {c:0, n:0};
+    by[c].n++; if(q.ok) by[c].c++;
+    if(q.ok) delete state.wrongIds[q.w.id]; else state.wrongIds[q.w.id] = true;
+  });
+  if(quiz.mode !== "wrong"){
+    Object.keys(by).forEach(function(id){
+      var h = state.quizHistory[id] = state.quizHistory[id] || [];
+      h.push({t:Date.now(), c:by[id].c, n:by[id].n});
+      if(h.length > 30) h.splice(0, h.length-30);
+    });
+  }
+  saveState();
+  var correct = quiz.qs.filter(function(q){ return q.ok; }).length;
+  var total = quiz.qs.length;
+  var p = pct(correct, total);
+  var msg = p === 100 ? "全問正解です！完璧です。" : (p >= 90 ? "すばらしい！本番も自信をもって。" : (p >= 70 ? "あと少し。間違えた単語を見直しましょう。" : "まだ伸びしろ十分。もう一度カードで復習しましょう。"));
+  var wrong = quiz.qs.filter(function(q){ return !q.ok; });
+  var html = '<div class="result-hero"><div class="result-score">'+correct+'<span> / '+total+'</span></div>'+
+    '<div class="result-msg">正答率 '+p+'% ・ '+msg+'</div></div>';
+  var keys = Object.keys(by);
+  if(keys.length > 1){
+    html += '<div class="setup-label">章ごとの結果</div><div class="chapter-breakdown">';
+    keys.forEach(function(id){
+      var ch = chapterById(id); if(!ch) return;
+      var pp = pct(by[id].c, by[id].n);
+      html += '<div class="cb-row" style="--ch-color:'+chapterColor(ch)+'"><span class="cb-name">'+esc(ch.title)+'</span>'+
+        '<div class="progress-track"><div class="progress-fill" style="width:'+pp+'%"></div></div><span class="cb-pct">'+pp+'%</span></div>';
+    });
+    html += '</div>';
+  }
+  if(wrong.length){
+    html += '<div class="setup-label">間違えた単語 ('+wrong.length+'語)</div><div class="review-list">';
+    wrong.forEach(function(q){
+      html += '<div class="review-item"><div class="rq">'+esc(q.w.en)+'</div>'+
+        '<div class="ra right">正解: <b>'+esc(q.w.ja)+'</b></div>'+
+        '<div class="ra wrong">あなたの答え: <b>'+esc(q.opts[q.picked] ? q.opts[q.picked].ja : "")+'</b></div></div>';
+    });
+    html += '</div>';
+  }
+  html += '<div class="btn-row" style="margin-top:20px;">';
+  if(wrong.length) html += '<button class="btn btn-primary" id="res-retry-wrong">間違えた'+wrong.length+'語をもう一度</button>';
+  html += '<button class="btn btn-ghost" id="res-again">設定に戻る</button>'+
+    '<button class="btn btn-ghost" id="res-home">ホームへ</button></div>';
+  $("quiz-play").hidden = true;
+  var r = $("quiz-result");
+  r.hidden = false;
+  r.innerHTML = html;
+  window.scrollTo(0,0);
+  var rw = $("res-retry-wrong");
+  if(rw) rw.onclick = function(){ startQuiz(wrong.map(function(q){ return q.w.id; }), "wrong"); };
+  $("res-again").onclick = function(){ renderQuizSetup(); };
+  $("res-home").onclick = function(){ show("home"); };
+}
+
+/* ============================================================
+   WORD LIST (all chapters)
+   ============================================================ */
+var wordsFilter = {ch:0, q:""};
+function renderWords(){
+  $("words-sub").textContent = "全"+state.words.length+"語を章別に一覧できます。";
+  if(wordsFilter.ch && !chapterById(wordsFilter.ch)) wordsFilter.ch = 0;
+  renderChapterPills("words-chapter-pills", wordsFilter.ch, true, function(v){
+    wordsFilter.ch = v; renderWords();
+  }, false);
+  var q = wordsFilter.q.trim().toLowerCase();
+  var html = "";
+  state.chapters.forEach(function(ch, i){
+    if(wordsFilter.ch && wordsFilter.ch !== ch.id) return;
+    var ws = wordsOf(ch.id).filter(function(w){
+      return !q || w.en.toLowerCase().indexOf(q) >= 0 || w.ja.toLowerCase().indexOf(q) >= 0;
+    });
+    if(!ws.length) return;
+    html += '<div class="gloss-group" style="--gc:'+chapterColor(ch)+'"><div class="gloss-cat-title">'+(i+1)+'. '+esc(ch.title)+
+      '<span class="cat-count">'+ws.length+'語</span></div><dl style="margin:0">';
+    ws.forEach(function(w){
+      var st = state.cards[w.id];
+      html += '<div class="gloss-item'+(st?" status-"+st:"")+'"><dt>'+esc(w.en)+'</dt><dd>'+esc(w.ja)+'</dd></div>';
+    });
+    html += '</dl></div>';
+  });
+  $("words-list").innerHTML = html || '<div class="empty-note">'+(state.words.length ? "該当する単語がありません。" : "まだ単語がありません。ホームで章を追加して、写真から取り込みましょう。")+'</div>';
+}
+$("words-search").addEventListener("input", function(e){ wordsFilter.q = e.target.value; renderWords(); });
+
+/* ============================================================
+   CLOUD SYNC (Firebase Auth + Firestore)
+   ※ Firebase プロジェクト「TARGET」(target-27d3f) を利用します。
+     データはコレクション "vocab_progress" に保存します。
+   ============================================================ */
+var FIREBASE_CONFIG = {
+  apiKey: "AIzaSyDRQWv56zOQtveXW3659v_DvJGr4uclfCY",
+  authDomain: "target-27d3f.firebaseapp.com",
+  projectId: "target-27d3f",
+  storageBucket: "target-27d3f.firebasestorage.app",
+  messagingSenderId: "949994789348",
+  appId: "1:949994789348:web:fe0cb7349531e8a037cff1",
+  measurementId: "G-DDCBTJYF6N"
+};
+var CLOUD_COLLECTION = "vocab_progress";
+var FIREBASE_SDK_VERSION = "10.14.1";
+var fbApp = null, fbAuth = null, fbDb = null, fbUser = null, fbLastSynced = null, fbSyncTimer = null;
+var fbLoadPromise = null, fbInitError = null, fbSyncError = null;
+
+function ensureFirebaseSdkLoaded(){
+  if(fbLoadPromise) return fbLoadPromise;
+  var base = "https://www.gstatic.com/firebasejs/"+FIREBASE_SDK_VERSION+"/";
+  fbLoadPromise = loadScriptTag(base+"firebase-app-compat.js")
+    .then(function(){ return loadScriptTag(base+"firebase-auth-compat.js"); })
+    .then(function(){ return loadScriptTag(base+"firebase-firestore-compat.js"); });
+  return fbLoadPromise;
+}
+function initFirebase(){
+  return ensureFirebaseSdkLoaded().then(function(){
+    if(!fbApp){
+      fbApp = firebase.initializeApp(FIREBASE_CONFIG);
+      fbAuth = firebase.auth();
+      fbDb = firebase.firestore();
+      fbAuth.onAuthStateChanged(function(user){
+        fbUser = user;
+        renderCloudPanel();
+        if(user) syncOnSignIn(false);
+      });
+    }
+    renderCloudPanel();
+  }).catch(function(err){
+    fbInitError = err;
+    renderCloudPanel();
+  });
+}
+function firebaseSignIn(){
+  var run = fbAuth ? Promise.resolve() : initFirebase();
+  run.then(function(){
+    if(!fbAuth){
+      alert("Firebaseの読み込みに失敗しました。通信状況を確認して、ページを再読み込みしてください。");
+      return;
+    }
+    var provider = new firebase.auth.GoogleAuthProvider();
+    fbAuth.signInWithPopup(provider).catch(function(err){
+      alert("ログインに失敗しました。\n"+err.message);
+    });
+  });
+}
+function firebaseSignOut(){ if(fbAuth) fbAuth.signOut(); }
+function cloudDocRef(){ return fbDb.collection(CLOUD_COLLECTION).doc(fbUser.uid); }
+function cloudPayload(){
+  return {
+    chapters: state.chapters,
+    words: state.words,
+    cards: state.cards,
+    quizHistory: state.quizHistory,
+    wrongIds: state.wrongIds,
+    localUpdatedAt: state.updatedAt || Date.now(),
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+  };
+}
+function applyRemote(remote){
+  state = normalizeState({
+    chapters: remote.chapters, words: remote.words, cards: remote.cards,
+    quizHistory: remote.quizHistory, wrongIds: remote.wrongIds, updatedAt: remote.localUpdatedAt
+  });
+  try{ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }catch(e){}
+  curCh = null; resetOcr(); deckKey = "";
+  refreshAllViews();
+  fbLastSynced = new Date();
+  fbSyncError = null;
+  renderCloudPanel();
+}
+// manual=true: 「今すぐ同期」ボタンから
+function syncOnSignIn(manual){
+  if(!fbUser || !fbDb) return;
+  cloudDocRef().get().then(function(doc){
+    if(!doc.exists){ pushToCloud(); return; }
+    var remote = doc.data() || {};
+    var remoteAt = Number(remote.localUpdatedAt) || 0;
+    var localAt = state.updatedAt || 0;
+    if(isStateEmpty(state)){ applyRemote(remote); return; }            // 新しい端末: クラウドから復元
+    if(remoteAt === localAt){ fbLastSynced = new Date(); fbSyncError = null; renderCloudPanel(); return; }
+    if(localAt > remoteAt){ pushToCloud(); return; }                    // この端末の方が新しい
+    // クラウドの方が新しい → 確認
+    var useCloud = confirm(
+      "クラウドに、この端末より新しい学習データがあります。\n\n"+
+      "[OK] クラウドのデータを使う (この端末の記録は上書きされます)\n"+
+      "[キャンセル] この端末のデータをクラウドにアップロードする (クラウドの記録は上書きされます)"
+    );
+    if(useCloud) applyRemote(remote); else pushToCloud();
+  }).catch(function(err){
+    fbSyncError = err;
+    renderCloudPanel();
+    if(manual) alert("クラウドとの同期に失敗しました。\n"+err.message);
+  });
+}
+function pushToCloud(){
+  if(!fbUser || !fbDb) return;
+  cloudDocRef().set(cloudPayload()).then(function(){
+    fbLastSynced = new Date(); fbSyncError = null;
+    renderCloudPanel();
+  }).catch(function(err){
+    console.error("cloud push failed", err);
+    fbSyncError = err;
+    renderCloudPanel();
+  });
+}
+function scheduleCloudPush(){
+  if(!fbUser || !fbDb) return;
+  clearTimeout(fbSyncTimer);
+  fbSyncTimer = setTimeout(pushToCloud, 900);
+}
+function renderCloudPanel(){
+  var panel = $("cloud-panel");
+  if(!panel || curView !== "settings") return;
+  if(fbInitError){
+    panel.innerHTML =
+      '<p class="data-panel-note">クラウド同期の読み込みに失敗しました。通信状況を確認して、ページを再読み込みしてください。</p>'+
+      '<div class="btn-row"><button class="btn btn-ghost" id="fb-retry-btn">再読み込み</button></div>';
+    $("fb-retry-btn").addEventListener("click", function(){ location.reload(); });
+    return;
+  }
+  if(!fbUser){
+    panel.innerHTML =
+      '<p class="data-panel-note">Google アカウントでログインすると、章・単語・進捗をクラウドと同期できます。別の端末でも同じアカウントでログインするだけで、続きから学習できます。</p>'+
+      '<div class="btn-row"><button class="btn btn-primary" id="fb-signin-btn">Google でログインして同期</button></div>';
+    $("fb-signin-btn").addEventListener("click", firebaseSignIn);
+    return;
+  }
+  var lastText = fbLastSynced ? ("最終同期: "+fbLastSynced.toLocaleString("ja-JP")) : "同期待ち…";
+  var errText = fbSyncError ? '<p class="data-panel-note ocr-msg-err">同期に失敗しました: '+esc(fbSyncError.message || fbSyncError)+
+    '<br>Firestoreのルールで「'+CLOUD_COLLECTION+'」コレクションへの読み書きが許可されているか確認してください。</p>' : "";
+  panel.innerHTML =
+    '<p class="data-panel-note">'+esc(fbUser.email || "Google アカウント")+' としてログイン中。学習内容は自動的にクラウドに保存されます。</p>'+
+    '<p class="data-panel-note mono" style="margin-top:-10px;">'+esc(lastText)+'</p>'+errText+
+    '<div class="btn-row"><button class="btn btn-ghost" id="fb-sync-now">今すぐ同期</button>'+
+    '<button class="btn btn-ghost" id="fb-signout-btn">ログアウト</button></div>';
+  $("fb-sync-now").addEventListener("click", function(){ syncOnSignIn(true); });
+  $("fb-signout-btn").addEventListener("click", firebaseSignOut);
+}
+
+/* ============================================================
+   BACKUP (export / import)
+   ============================================================ */
+$("data-export-btn").addEventListener("click", function(){
+  var blob = new Blob([JSON.stringify(state, null, 2)], {type:"application/json"});
+  var a = document.createElement("a");
+  var d = new Date();
+  var stamp = d.getFullYear()+("0"+(d.getMonth()+1)).slice(-2)+("0"+d.getDate()).slice(-2);
+  a.href = URL.createObjectURL(blob);
+  a.download = "eitango-lab-"+stamp+".json";
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(function(){ URL.revokeObjectURL(a.href); }, 1000);
+});
+$("data-import-btn").addEventListener("click", function(){ $("data-import-file").click(); });
+$("data-import-file").addEventListener("change", function(e){
+  var f = e.target.files && e.target.files[0];
+  e.target.value = "";
+  if(!f) return;
+  var rd = new FileReader();
+  rd.onload = function(){
+    try{
+      var obj = JSON.parse(rd.result);
+      if(!obj || !Array.isArray(obj.chapters) || !Array.isArray(obj.words)) throw new Error("形式が違います");
+      if(!confirm("読み込むと、この端末の現在のデータ("+state.chapters.length+"章 / "+state.words.length+"語)は上書きされます。よろしいですか？")) return;
+      state = normalizeState(obj);
+      curCh = null; resetOcr(); deckKey = "";
+      saveState();
+      toast("読み込みました("+state.chapters.length+"章 / "+state.words.length+"語)");
+      show("home");
+    }catch(err){
+      alert("読み込みに失敗しました。書き出したJSONファイルを選んでください。\n"+err.message);
+    }
+  };
+  rd.readAsText(f);
+});
+
+/* ============================================================
+   BOOT
+   ============================================================ */
+window.VocabApp = {parseOcrText: parseOcrText, parseLines: parseLines, rowsFromWords: rowsFromWords, makeRedMask: makeRedMask, loadColorCanvas: loadColorCanvas, redRowsFromWords: redRowsFromWords};   // 動作確認用
+buildNav();
+show("home");
+initFirebase();
+})();
+</script>
+</body>
+</html>
