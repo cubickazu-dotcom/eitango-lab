@@ -627,18 +627,64 @@ dialog h3{font-size:17px; margin-bottom:12px;}
 dialog .btn-row{margin-top:16px; justify-content:flex-end;}
 .toast{position:fixed; left:50%; bottom:96px; transform:translateX(-50%); width:max-content; background:var(--text); color:var(--bg); padding:10px 18px; border-radius:999px; font-size:13.5px; font-weight:700; z-index:99; opacity:0; pointer-events:none; transition:opacity .25s; max-width:90vw; text-align:center;}
 .toast.show{opacity:1;}
+html{-webkit-text-size-adjust:100%; text-size-adjust:100%;}
+button,.pill,.seg-btn,.opt,.chapter-card{touch-action:manipulation; -webkit-tap-highlight-color:transparent;}
+#app{min-height:100vh; min-height:100dvh;}
 @media (max-width:860px){
-  .tabbar{position:fixed; left:0; right:0; bottom:0; z-index:20;}
+  .tabbar{position:fixed; left:0; right:0; bottom:0; z-index:20; padding-left:max(4px, env(safe-area-inset-left)); padding-right:max(4px, env(safe-area-inset-right));}
   .tabbar-row{flex-direction:row;}
-  .main{padding-bottom:96px;}
+  .main{padding:16px max(16px, env(safe-area-inset-right)) calc(92px + env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));}
+  .toast{bottom:calc(84px + env(safe-area-inset-bottom));}
+  /* iOS zooms the whole page when a field under 16px is focused - keep every field at 16px */
+  .inp, select.inp, .search-box input, #dlg-input, .wr-fields input{font-size:16px;}
+  /* tighter page header so the content starts higher on a small screen */
+  .page-head{margin-bottom:14px;}
+  .page-head h1{font-size:22px;}
+  .page-head p{font-size:13px; line-height:1.6;}
+  /* chapter pills: one swipeable line instead of a tall wrapped block */
+  #flash-chapter-pills, #words-chapter-pills{flex-wrap:nowrap; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; margin-left:-16px; margin-right:-16px; padding:2px 16px 4px; margin-bottom:12px;}
+  #flash-chapter-pills::-webkit-scrollbar, #words-chapter-pills::-webkit-scrollbar{display:none;}
+  #flash-chapter-pills .pill, #words-chapter-pills .pill{flex:none; white-space:nowrap;}
+  /* flashcards: hide the long blurb and pack the options so the card is visible without scrolling */
+  #view-flash .page-head p{display:none;}
+  #view-flash .opt-row{margin:0 0 10px;}
+  .toggle-row{gap:8px; }
+  .toggle-row .seg-toggle{margin-bottom:10px; max-width:100%;}
+  .toggle-row .seg-btn{padding:8px 12px; font-size:13px; white-space:nowrap;}
+  .chapter-context{margin-bottom:8px;}
 }
 @media (max-width:560px){
   .opt-row label.sel-label{flex-direction:column; align-items:flex-start; width:100%;}
   select.inp{width:100%;}
-  .wr-fields{grid-template-columns:1fr;}
+  /* word rows: no row number, English + Japanese stacked and compact */
+  .wrow{gap:10px; padding:9px 0;}
+  .wrow .wr-no{display:none;}
+  .wr-fields{grid-template-columns:1fr; gap:6px;}
+  .wr-fields .inp{padding:8px 11px;}
   .fc-en{font-size:28px;}
   .q-word{font-size:26px;}
   .fl-en{max-width:52%;}
+  .stat-row{gap:10px;}
+  .stat-card{padding:14px 14px;}
+  dialog{padding:18px;}
+  /* flashcard: direction + mode toggles share one line, all five card buttons stay on one line */
+  .toggle-row{flex-wrap:nowrap; align-items:flex-start;}
+  #flash-dir-toggle{display:flex; flex:1 1 auto; min-width:0;}
+  #flash-dir-toggle .seg-btn{flex:1; padding:8px 4px; font-size:12.5px;}
+  #flash-mode-toggle{flex:none;}
+  #flash-mode-toggle .seg-btn{padding:8px 10px; font-size:12.5px;}
+  .fc-controls{flex-wrap:nowrap; gap:8px;}
+  .fc-controls .iconbtn{width:40px; height:40px; flex:none;}
+  .fc-controls .status-btn{flex:1 1 0; min-width:0; padding:12px 2px; font-size:13px; white-space:nowrap;}
+  .fc-controls .status-btn.is-active{outline-offset:-3px;}
+  .flashcard, .flashcard-inner{min-height:230px;}
+}
+@media (max-width:340px){
+  .toggle-row{flex-wrap:wrap;}
+  #flash-dir-toggle{flex:1 1 100%;}
+  .toggle-row .seg-btn{padding:8px 9px; font-size:12.5px;}
+  .tabbar .nav-item{font-size:10px;}
+  .page-head h1{font-size:20px;}
 }
 </style>
 </head>
