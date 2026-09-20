@@ -627,6 +627,47 @@ dialog h3{font-size:17px; margin-bottom:12px;}
 dialog .btn-row{margin-top:16px; justify-content:flex-end;}
 .toast{position:fixed; left:50%; bottom:96px; transform:translateX(-50%); width:max-content; background:var(--text); color:var(--bg); padding:10px 18px; border-radius:999px; font-size:13.5px; font-weight:700; z-index:99; opacity:0; pointer-events:none; transition:opacity .25s; max-width:90vw; text-align:center;}
 .toast.show{opacity:1;}
+/* ---- home: this week's chapter first, past chapters folded away ---- */
+.hero-card{background:var(--surface); border:1px solid var(--border); border-radius:20px; padding:22px 22px 18px; position:relative; overflow:hidden; display:flex; flex-direction:column; gap:14px; box-shadow:0 1px 0 rgba(0,0,0,.02), 0 8px 24px -14px rgba(20,30,80,.25);}
+.hero-card::before{content:""; position:absolute; inset:0 0 auto 0; height:6px; background:var(--ch-color);}
+.hero-card .ch-top{display:flex; align-items:center; justify-content:space-between; margin-top:2px;}
+.hero-card .ch-num{font-family:"JetBrains Mono",monospace; font-weight:700; font-size:12px; color:var(--ch-color); background:color-mix(in srgb, var(--ch-color) 14%, transparent); padding:3px 9px; border-radius:999px;}
+.hero-title{font-family:"Zen Kaku Gothic New","Noto Sans JP",sans-serif; font-size:24px; font-weight:900; line-height:1.35; word-break:break-word;}
+.hero-card .ch-meta{display:flex; justify-content:space-between; font-size:13px; color:var(--text-muted); margin-top:-6px;}
+.hero-card .progress-track{height:8px;}
+.hero-hint{font-size:13.5px; color:var(--text-muted); margin:0;}
+.hero-actions{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+.hero-actions .btn{padding:14px 12px; font-size:15px; justify-content:center;}
+.hero-actions .btn[data-act=photo]{grid-column:1 / -1;}
+.hero-open{align-self:center; background:none; border:none; color:var(--accent); font-weight:700; font-size:13.5px; cursor:pointer; padding:6px 10px;}
+.home-add{margin:12px 0 4px; display:flex; justify-content:flex-end;}
+.home-empty{padding:34px 20px; line-height:1.9;}
+.home-empty b{font-size:16px; color:var(--text);}
+.past-box{margin-top:22px; background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:0;}
+.past-box > summary{list-style:none; cursor:pointer; padding:14px 18px; display:flex; align-items:center; gap:8px; font-weight:700; font-size:14px; color:var(--text-muted);}
+.past-box > summary::-webkit-details-marker{display:none;}
+.past-box > summary::after{content:"▾"; margin-left:auto; transition:transform .2s;}
+.past-box[open] > summary::after{transform:rotate(180deg);}
+.past-box[open] > summary{border-bottom:1px solid var(--border); color:var(--text);}
+.past-count{font-family:"JetBrains Mono",monospace; font-weight:700; color:var(--text-faint);}
+.past-row{display:flex; align-items:center; gap:10px; width:100%; text-align:left; background:none; border:none; border-bottom:1px solid var(--border); padding:12px 18px; cursor:pointer; color:var(--text); font:inherit;}
+.past-row:last-child{border-bottom:none;}
+.past-row:hover{background:var(--surface-2);}
+.pr-num{font-family:"JetBrains Mono",monospace; font-weight:700; font-size:11.5px; color:var(--ch-color); background:color-mix(in srgb, var(--ch-color) 14%, transparent); padding:2px 8px; border-radius:999px; flex:none;}
+.pr-title{flex:1; min-width:0; font-weight:700; font-size:14.5px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+.pr-meta{font-size:12px; color:var(--text-muted); flex:none;}
+.home-stats{margin-top:22px;}
+.home-stats .stat-card{padding:14px 16px;}
+/* chapter pickers (cards / test / word list) */
+.pill-cur{max-width:100%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+select.pill-select{width:auto; max-width:100%; border-radius:999px; padding:7px 30px 7px 14px; font-size:13.5px; font-weight:500; color:var(--text-muted);}
+select.pill-select.active{background-color:var(--accent); color:var(--accent-contrast); border-color:var(--accent); font-weight:700;}
+.past-pick{flex-basis:100%; margin-top:2px;}
+.past-pick > summary{cursor:pointer; font-size:13px; font-weight:700; color:var(--text-muted); padding:6px 2px; list-style:none;}
+.past-pick > summary::-webkit-details-marker{display:none;}
+.past-pick > summary::before{content:"▸ ";}
+.past-pick[open] > summary::before{content:"▾ ";}
+.past-pick .pill-row{margin:6px 0 4px;}
 html{-webkit-text-size-adjust:100%; text-size-adjust:100%;}
 button,.pill,.seg-btn,.opt,.chapter-card{touch-action:manipulation; -webkit-tap-highlight-color:transparent;}
 #app{min-height:100vh; min-height:100dvh;}
@@ -646,7 +687,9 @@ button,.pill,.seg-btn,.opt,.chapter-card{touch-action:manipulation; -webkit-tap-
   #flash-chapter-pills::-webkit-scrollbar, #words-chapter-pills::-webkit-scrollbar{display:none;}
   #flash-chapter-pills .pill, #words-chapter-pills .pill{flex:none; white-space:nowrap;}
   /* flashcards: hide the long blurb and pack the options so the card is visible without scrolling */
-  #view-flash .page-head p{display:none;}
+  #view-flash .page-head p, #view-home .page-head p{display:none;}
+  #view-home .page-head{margin-bottom:6px;}
+  .hero-title{font-size:22px;}
   #view-flash .opt-row{margin:0 0 10px;}
   .toggle-row{gap:8px; }
   .toggle-row .seg-toggle{margin-bottom:10px; max-width:100%;}
@@ -705,25 +748,29 @@ button,.pill,.seg-btn,.opt,.chapter-card{touch-action:manipulation; -webkit-tap-
     <!-- ===== HOME ===== -->
     <section class="view" id="view-home">
       <div class="page-head">
-        <span class="eyebrow">Dashboard</span>
-        <h1>週テスト対策</h1>
-        <p>1回のテスト範囲を「章」にして、単語帳の写真から単語を取り込みましょう。</p>
+        <span class="eyebrow">Home</span>
+        <h1>ホーム</h1>
+        <p>最新の章から、すぐに学習を始められます。</p>
       </div>
 
-      <div class="stat-row">
+      <div id="home-current"></div>
+
+      <details class="past-box" id="past-box" hidden>
+        <summary><span>過去の章</span><span class="past-count" id="past-count"></span></summary>
+        <div id="past-list"></div>
+      </details>
+
+      <div class="stat-row home-stats">
         <div class="stat-card"><div class="num mono" id="stat-mastered">0</div><div class="lbl">覚えた単語</div></div>
         <div class="stat-card"><div class="num mono" id="stat-total">0</div><div class="lbl">総単語数</div></div>
         <div class="stat-card"><div class="num mono" id="stat-chapters">0</div><div class="lbl">章の数</div></div>
         <div class="stat-card"><div class="num mono" id="stat-avg">–</div><div class="lbl">テスト平均正答率</div></div>
       </div>
-
-      <div class="setup-label">章から始める</div>
-      <div class="chapter-grid" id="chapter-grid"></div>
     </section>
 
     <!-- ===== CHAPTER DETAIL ===== -->
     <section class="view" id="view-chapter" hidden>
-      <button class="btn btn-ghost btn-sm" id="ch-back">&larr; 章の一覧へ</button>
+      <button class="btn btn-ghost btn-sm" id="ch-back">&larr; ホームへ</button>
       <div class="page-head" style="margin-top:16px;">
         <span class="eyebrow" id="ch-eyebrow">Chapter</span>
         <h1 id="ch-title">章</h1>
@@ -732,13 +779,13 @@ button,.pill,.seg-btn,.opt,.chapter-card{touch-action:manipulation; -webkit-tap-
       <div class="btn-row" style="margin-bottom:8px;">
         <button class="btn btn-primary" id="ch-study">カードで学習</button>
         <button class="btn btn-primary" id="ch-test">この章をテスト</button>
+        <button class="btn btn-ghost" id="ch-setcur">最新の章にする</button>
         <button class="btn btn-ghost" id="ch-rename">章名を変更</button>
         <button class="btn btn-ghost danger" id="ch-delete">章を削除</button>
       </div>
 
       <div class="setup-label">写真から単語を追加</div>
       <div class="panel">
-        <p class="data-panel-note">単語帳のページを撮影して選ぶと、左の英単語と、赤字の日本語の意味だけを読み取ります(黒字の例文や派生語は取り込みません)。複数枚をまとめて選べて、あとから何度でも追加できます。追加する前に、読み取り結果を確認・修正できます。</p>
         <div class="opt-row">
           <label class="sel-label">読み取りモード
             <select class="inp" id="ocr-mode">
@@ -759,7 +806,6 @@ button,.pill,.seg-btn,.opt,.chapter-card{touch-action:manipulation; -webkit-tap-
           <div class="progress-track" style="--ch-color:var(--accent);"><div class="progress-fill" id="ocr-bar" style="width:0%"></div></div>
         </div>
         <div id="ocr-review"></div>
-        <p class="tip">撮影のコツ: 明るい場所で、影が入らないよう真上から1ページずつ撮ると精度が上がります。初回は読み取り用データ(数MB)のダウンロードで少し時間がかかりますが、2回目以降は速くなります。</p>
       </div>
 
       <div class="setup-label">1語ずつ手入力で追加</div>
@@ -980,7 +1026,12 @@ function buildNav(){
       b.className = "nav-item";
       b.dataset.nav = n.id;
       b.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'+n.icon+'</svg><span>'+n.label+'</span>';
-      b.addEventListener("click", function(){ show(n.id); });
+      b.addEventListener("click", function(){
+        if(n.id === "flash" && curView !== "flash") flash.ch = null;
+        if(n.id === "quiz" && curView !== "quiz"){ quiz.sel = {}; quiz.initSel = false; }
+        if(n.id === "words" && curView !== "words") wordsFilter.userPicked = false;
+        show(n.id);
+      });
       box.appendChild(b);
     });
   });
@@ -1043,6 +1094,28 @@ function chapterIndex(id){
   return 0;
 }
 function chapterColor(ch){ return "var(--ch"+(((ch.color||0)%6)+1)+")"; }
+/* "this week's chapter": the one marked (ch.cur), otherwise the newest chapter */
+function currentChapter(){
+  var i;
+  for(i=0;i<state.chapters.length;i++){ if(state.chapters[i].cur) return state.chapters[i]; }
+  return state.chapters.length ? state.chapters[state.chapters.length-1] : null;
+}
+function isCurrentChapter(id){ var c = currentChapter(); return !!c && c.id === id; }
+function pastChapters(){          // everything except this week's chapter, newest first
+  var c = currentChapter();
+  return state.chapters.filter(function(x){ return !c || x.id !== c.id; }).slice().reverse();
+}
+function setCurrentChapter(id){
+  state.chapters.forEach(function(c){ if(c.id === id) c.cur = true; else delete c.cur; });
+  saveState();
+  resetFocus();
+}
+/* study / test / word-list screens start on this week's chapter again */
+function resetFocus(){
+  flash.ch = null; deckKey = "";
+  quiz.sel = {}; quiz.initSel = false;
+  wordsFilter.userPicked = false;
+}
 function wordsOf(chId){ return state.words.filter(function(w){ return w.ch === chId; }); }
 function wordById(id){
   for(var i=0;i<state.words.length;i++){ if(state.words[i].id === id) return state.words[i]; }
@@ -1088,7 +1161,7 @@ function submitChapterDialog(){
   }else{
     var nc = {id:uid("c"), title:title, color:state.chapters.length % 6, photos:0, created:Date.now()};
     state.chapters.push(nc);
-    saveState();
+    setCurrentChapter(nc.id);          // saves; the new chapter is now "this week"
     closeChapterDialog();
     toast("章を追加しました。写真か手入力で単語を追加しましょう");
     openChapter(nc.id);
@@ -1103,6 +1176,12 @@ $("dlg-input").addEventListener("keydown", function(e){
 /* ============================================================
    HOME
    ============================================================ */
+function lastBadge(ch){
+  var t = lastTest(ch.id);
+  if(!t) return '<span class="ch-last">未テスト</span>';
+  var p = pct(t.c, t.n);
+  return '<span class="ch-last '+(p>=80?"good":(p<60?"bad":""))+'">前回 '+p+'%</span>';
+}
 function renderHome(){
   var total = state.words.length;
   $("stat-mastered").textContent = masteredCount(state.words);
@@ -1115,34 +1194,57 @@ function renderHome(){
   });
   $("stat-avg").textContent = ps.length ? Math.round(ps.reduce(function(a,b){return a+b;},0)/ps.length)+"%" : "–";
 
-  var grid = $("chapter-grid");
-  var html = "";
-  state.chapters.forEach(function(ch, i){
-    var ws = wordsOf(ch.id);
-    var m = masteredCount(ws);
-    var t = lastTest(ch.id);
-    var lastHtml = "";
-    if(t){
-      var p = pct(t.c, t.n);
-      lastHtml = '<span class="ch-last '+(p>=80?"good":(p<60?"bad":""))+'">前回 '+p+'%</span>';
-    }else{
-      lastHtml = '<span class="ch-last">未テスト</span>';
-    }
-    html += '<button class="chapter-card" data-ch="'+esc(ch.id)+'" style="--ch-color:'+chapterColor(ch)+'">'+
-      '<div class="ch-top"><span class="ch-num">'+(i+1)+'</span>'+lastHtml+'</div>'+
-      '<h3>'+esc(ch.title)+'</h3>'+
+  var cur = currentChapter(), box = $("home-current");
+  if(!cur){
+    box.innerHTML = '<div class="empty-box home-empty"><b>まだ章がありません</b><br>テスト範囲を「章」にして、単語帳の写真を取り込みましょう。<br>'+
+      '<button class="btn btn-primary" id="add-chapter-card">＋ 最初の章を作る</button></div>';
+    $("past-box").hidden = true;
+    return;
+  }
+  var ws = wordsOf(cur.id), m = masteredCount(ws), has = ws.length > 0;
+  box.innerHTML =
+    '<div class="setup-label">最新の章</div>'+
+    '<div class="hero-card" style="--ch-color:'+chapterColor(cur)+'">'+
+      '<div class="ch-top"><span class="ch-num">'+(chapterIndex(cur.id)+1)+'</span>'+lastBadge(cur)+'</div>'+
+      '<h2 class="hero-title">'+esc(cur.title)+'</h2>'+
       '<div class="progress-track"><div class="progress-fill" style="width:'+pct(m, ws.length)+'%"></div></div>'+
       '<div class="ch-meta"><span>'+ws.length+'語</span><span>覚えた '+m+' / '+ws.length+'</span></div>'+
+      (has ? '' : '<p class="hero-hint">まだ単語がありません。「写真を追加」で単語帳のページを取り込みましょう。</p>')+
+      '<div class="hero-actions">'+
+        '<button class="btn btn-primary" data-act="study"'+(has?'':' disabled')+'>カードで学習</button>'+
+        '<button class="btn btn-primary" data-act="test"'+(has?'':' disabled')+'>テスト</button>'+
+        '<button class="btn btn-ghost" data-act="photo">写真を追加</button>'+
+      '</div>'+
+      '<button class="hero-open" data-act="open">単語の確認・修正 ›</button>'+
+    '</div>'+
+    '<div class="home-add"><button class="btn btn-ghost btn-sm" id="add-chapter-card">＋ 新しい章を追加</button></div>';
+
+  var past = pastChapters(), pb = $("past-box");
+  pb.hidden = !past.length;
+  $("past-count").textContent = past.length ? "("+past.length+")" : "";
+  var html = "";
+  past.forEach(function(ch){
+    var t = lastTest(ch.id);
+    html += '<button class="past-row" data-ch="'+esc(ch.id)+'" style="--ch-color:'+chapterColor(ch)+'">'+
+      '<span class="pr-num">'+(chapterIndex(ch.id)+1)+'</span>'+
+      '<span class="pr-title">'+esc(ch.title)+'</span>'+
+      '<span class="pr-meta">'+wordsOf(ch.id).length+'語 ・ '+(t ? "前回 "+pct(t.c, t.n)+"%" : "未テスト")+'</span>'+
     '</button>';
   });
-  html += '<button class="chapter-card add-card" id="add-chapter-card">＋ 章を追加</button>';
-  grid.innerHTML = html;
+  $("past-list").innerHTML = html;
 }
-$("chapter-grid").addEventListener("click", function(e){
-  var add = e.target.closest("#add-chapter-card");
-  if(add){ openChapterDialog("add"); return; }
-  var card = e.target.closest(".chapter-card[data-ch]");
-  if(card) openChapter(card.dataset.ch);
+$("view-home").addEventListener("click", function(e){
+  if(e.target.closest("#add-chapter-card")){ openChapterDialog("add"); return; }
+  var past = e.target.closest(".past-row[data-ch]");
+  if(past){ openChapter(past.dataset.ch); return; }
+  var act = e.target.closest("[data-act]");
+  var cur = currentChapter();
+  if(!act || !cur || act.disabled) return;
+  var a = act.dataset.act;
+  if(a === "study"){ flash.ch = cur.id; show("flash"); }
+  else if(a === "test"){ quiz.sel = {}; quiz.sel[cur.id] = true; quiz.initSel = true; show("quiz"); }
+  else if(a === "open"){ openChapter(cur.id); }
+  else if(a === "photo"){ openChapter(cur.id); $("ocr-file").click(); }   // straight to the photo picker (same tap)
 });
 
 /* ============================================================
@@ -1157,7 +1259,8 @@ function openChapter(id){
 function renderChapter(){
   var ch = chapterById(curCh);
   if(!ch){ show("home"); return; }
-  $("ch-eyebrow").textContent = "Chapter " + (chapterIndex(ch.id)+1);
+  $("ch-eyebrow").textContent = "Chapter " + (chapterIndex(ch.id)+1) + (isCurrentChapter(ch.id) ? " ・ 最新の章" : " ・ 過去の章");
+  $("ch-setcur").hidden = isCurrentChapter(ch.id);
   $("ch-title").textContent = ch.title;
   var ws = wordsOf(ch.id);
   $("ch-sub").textContent = ws.length + "語" + (ch.photos ? " ・ 写真 " + ch.photos + "枚から読み込み済み" : "");
@@ -1269,6 +1372,13 @@ $("ch-test").addEventListener("click", function(){
   quiz.sel = {}; quiz.sel[curCh] = true;
   show("quiz");
 });
+$("ch-setcur").addEventListener("click", function(){
+  var ch = chapterById(curCh);
+  if(!ch) return;
+  setCurrentChapter(ch.id);
+  toast("「"+ch.title+"」を最新の章にしました");
+  renderChapter();
+});
 $("ch-rename").addEventListener("click", function(){ openChapterDialog("rename"); });
 $("ch-delete").addEventListener("click", function(){
   var ch = chapterById(curCh);
@@ -1281,6 +1391,7 @@ $("ch-delete").addEventListener("click", function(){
   saveState();
   curCh = null;
   resetOcr();
+  resetFocus();
   toast("章を削除しました");
   show("home");
 });
@@ -2177,21 +2288,42 @@ function commitReview(){
 var flash = {ch:null, mode:"card", dir:"en", onlyNew:false, shuffle:false, hide:false, deck:[], idx:0, flipped:false};
 try{ if(localStorage.getItem("vocab_flash_dir") === "ja") flash.dir = "ja"; }catch(e){}
 
+/* Chapter picker used by cards / test / word list.
+   This week's chapter is always one tap away; older chapters are tucked into a menu (single pick)
+   or a folded list (test: several can be ticked). */
 function renderChapterPills(boxId, selCh, withAll, onPick, isMulti, selMap){
-  var box = $(boxId);
-  var html = "";
+  var box = $(boxId), cur = currentChapter(), past = pastChapters(), html = "", i;
+  function pill(id, label, active, extra){
+    return '<button class="pill'+(active?" active":"")+(extra||"")+'" data-ch="'+esc(id)+'">'+label+'</button>';
+  }
+  function isSel(id){ return isMulti ? !!selMap[id] : selCh === id; }
+  if(cur) html += pill(cur.id, '最新 ・ '+esc(cur.title), isSel(cur.id), " pill-cur");
   if(withAll){
     var allActive = isMulti ? (state.chapters.length && state.chapters.every(function(c){ return selMap[c.id]; })) : selCh === 0;
-    html += '<button class="pill'+(allActive?" active":"")+'" data-ch="0">全章</button>';
+    html += pill("0", "全章", !!allActive);
   }
-  state.chapters.forEach(function(c, i){
-    var active = isMulti ? !!selMap[c.id] : selCh === c.id;
-    html += '<button class="pill'+(active?" active":"")+'" data-ch="'+esc(c.id)+'">'+(i+1)+'. '+esc(c.title)+'</button>';
-  });
-  box.innerHTML = html;
+  var pastSelected = 0;
+  past.forEach(function(c){ if(isSel(c.id)) pastSelected++; });
+  if(past.length && !isMulti){
+    var picked = past.some(function(c){ return c.id === selCh; });
+    html += '<select class="inp pill-select'+(picked?" active":"")+'" aria-label="過去の章から選ぶ">'+
+      '<option value="">過去の章 ('+past.length+')</option>';
+    past.forEach(function(c){
+      html += '<option value="'+esc(c.id)+'"'+(c.id === selCh ? " selected" : "")+'>'+(chapterIndex(c.id)+1)+'. '+esc(c.title)+'</option>';
+    });
+    html += '</select>';
+    box.innerHTML = html;
+  }else if(past.length && isMulti){
+    box.innerHTML = html +
+      '<details class="past-pick"'+(pastSelected ? " open" : "")+'><summary>過去の章から選ぶ ('+past.length+(pastSelected ? " ・ "+pastSelected+"選択中" : "")+')</summary>'+
+      '<div class="pill-row">'+past.map(function(c){ return pill(c.id, (chapterIndex(c.id)+1)+'. '+esc(c.title), isSel(c.id)); }).join("")+'</div></details>';
+  }else box.innerHTML = html;
   box.onclick = function(e){
     var b = e.target.closest(".pill");
     if(b) onPick(b.dataset.ch === "0" ? 0 : b.dataset.ch);
+  };
+  box.onchange = function(e){
+    if(e.target.tagName === "SELECT" && e.target.value) onPick(e.target.value);
   };
 }
 function noChaptersBox(el){
@@ -2210,7 +2342,8 @@ function buildDeck(){
 }
 function renderFlash(){
   if(flash.ch === null){
-    flash.ch = curCh || (state.chapters.length ? state.chapters[state.chapters.length-1].id : 0);
+    var cc = currentChapter();
+    flash.ch = cc ? cc.id : 0;
   }
   if(flash.ch && !chapterById(flash.ch)) flash.ch = 0;
   $("flash-only-new").checked = flash.onlyNew;
@@ -2400,7 +2533,7 @@ function renderQuizSetup(){
   // drop stale selections
   Object.keys(quiz.sel).forEach(function(id){ if(!chapterById(id)) delete quiz.sel[id]; });
   if(!Object.keys(quiz.sel).length && !quiz.initSel && state.chapters.length){
-    quiz.sel[state.chapters[state.chapters.length-1].id] = true;
+    quiz.sel[currentChapter().id] = true;
   }
   quiz.initSel = true;
 
@@ -2596,12 +2729,13 @@ function finishQuiz(){
 /* ============================================================
    WORD LIST (all chapters)
    ============================================================ */
-var wordsFilter = {ch:0, q:""};
+var wordsFilter = {ch:0, q:"", userPicked:false};
 function renderWords(){
-  $("words-sub").textContent = "全"+state.words.length+"語を章別に一覧できます。";
+  if(!wordsFilter.userPicked){ var cw = currentChapter(); wordsFilter.ch = cw ? cw.id : 0; }   // starts on this week's chapter
+  $("words-sub").textContent = "全"+state.words.length+"語を登録済みです。";
   if(wordsFilter.ch && !chapterById(wordsFilter.ch)) wordsFilter.ch = 0;
   renderChapterPills("words-chapter-pills", wordsFilter.ch, true, function(v){
-    wordsFilter.ch = v; renderWords();
+    wordsFilter.ch = v; wordsFilter.userPicked = true; renderWords();
   }, false);
   var q = wordsFilter.q.trim().toLowerCase();
   var html = "";
