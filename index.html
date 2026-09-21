@@ -600,14 +600,14 @@ details.raw pre{white-space:pre-wrap; background:var(--surface-2); border-radius
 .fc-en-sm{font-size:14px; color:var(--text-muted); font-weight:700;}
 .speak-btn{width:36px; height:36px;}
 .speak-btn svg{width:16px; height:16px;}
-.fl-row{display:flex; justify-content:space-between; align-items:center; gap:14px; padding:12px 6px 12px 10px; border-bottom:1px solid var(--border); border-left:4px solid transparent;}
+.fl-row{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.05fr) 36px; align-items:center; column-gap:12px; padding:12px 6px 12px 10px; border-bottom:1px solid var(--border); border-left:4px solid transparent;}
 .fl-row.status-mastered{border-left-color:var(--success);}
 .fl-row.status-review{border-left-color:var(--danger);}
-.fl-en{font-weight:800; font-size:16px; display:flex; align-items:center; gap:8px; flex:none; max-width:48%; word-break:break-word;}
-.fl-ja{color:var(--text-muted); font-size:14.5px; text-align:right; padding:2px 6px; border-radius:6px;}
+.fl-en{font-weight:800; font-size:16px; display:flex; align-items:center; justify-content:space-between; gap:8px; min-width:0; word-break:break-word;}
+.fl-ja{color:var(--text-muted); font-size:14.5px; text-align:left; padding:2px 0; border-radius:6px; min-width:0; word-break:break-word;}
 .fl-ja.q{color:var(--text); font-weight:800; font-size:16px; text-align:left;}
-.fl-en.a{font-weight:600; font-size:14.5px; color:var(--text-muted); justify-content:flex-end; text-align:right;}
-.fl-en.a.fl-ans{padding:2px 6px; border-radius:6px;}
+.fl-en.a{font-weight:600; font-size:14.5px; color:var(--text-muted); justify-content:space-between; text-align:left;}
+.fl-en.a.fl-ans{padding:2px 0; border-radius:6px;}
 .hide-ans .fl-ans:not(.revealed){color:transparent; background:var(--bg-alt); user-select:none; cursor:pointer;}
 
 .toggle-row{display:flex; gap:10px 14px; flex-wrap:wrap; align-items:center;}
@@ -706,7 +706,6 @@ button,.pill,.seg-btn,.opt,.chapter-card{touch-action:manipulation; -webkit-tap-
   .wr-fields .inp{padding:8px 11px;}
   .fc-en{font-size:28px;}
   .q-word{font-size:26px;}
-  .fl-en{max-width:52%;}
   .stat-row{gap:10px;}
   .stat-card{padding:14px 14px;}
   dialog{padding:18px;}
@@ -747,7 +746,7 @@ button,.pill,.seg-btn,.opt,.chapter-card{touch-action:manipulation; -webkit-tap-
 .card-flag{position:absolute; top:8px; right:8px; z-index:2;}
 .gloss-item.has-flag{position:relative; padding-right:48px;}
 .gloss-item.has-flag .flag-btn{position:absolute; top:50%; right:2px; transform:translateY(-50%);}
-.fl-row .flag-btn{margin-left:-6px;}
+.fl-row .flag-btn{justify-self:end;}
 .tag-toggle{display:inline-flex; align-items:center; gap:6px; margin-top:10px; padding:7px 12px; border-radius:999px; border:1px solid var(--border); background:var(--surface); color:var(--text-muted); font:inherit; font-size:13px; font-weight:700; cursor:pointer;}
 .tag-toggle svg{width:16px; height:16px; fill:none;}
 .tag-toggle.on{color:#b57c00; border-color:#d99a00; background:color-mix(in srgb, #d99a00 12%, var(--surface));}
