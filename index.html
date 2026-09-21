@@ -729,9 +729,35 @@ button,.pill,.seg-btn,.opt,.chapter-card{touch-action:manipulation; -webkit-tap-
   .tabbar .nav-item{font-size:10px;}
   .page-head h1{font-size:20px;}
 }
+.spell-pat{font-family:"JetBrains Mono",monospace; font-size:22px; letter-spacing:.06em; color:var(--text-muted); margin:2px 0 0; word-break:break-all; line-height:1.5;}
+.spell-count{font-size:12px; color:var(--text-muted); margin-bottom:12px;}
+.spell-inp{font-size:22px; padding:14px 14px; font-family:"JetBrains Mono",monospace; letter-spacing:.02em;}
+.spell-inp.correct{border-color:#2f9e6b; background:color-mix(in srgb, #2f9e6b 12%, var(--surface));}
+.spell-inp.incorrect{border-color:#d1495b; background:color-mix(in srgb, #d1495b 12%, var(--surface));}
+.spell-btns{display:flex; flex-wrap:wrap; gap:8px; margin-top:12px;}
+.spell-btns .btn-primary{flex:1 1 140px; justify-content:center;}
+.explain .speak-btn{display:inline-flex; vertical-align:middle; margin-left:4px; width:32px; height:32px;}
+.explain-sub{margin-top:6px; font-size:13.5px; color:var(--text-muted);}
+.hero-actions .btn[data-act=wrong]{grid-column:1 / -1;}
+.wrong-review-box .btn-row{flex-wrap:wrap;}
+.flag-btn{color:var(--text-muted); flex:none;}
+.flag-btn svg{fill:none;}
+.flag-btn.on{color:#d99a00;}
+.flag-btn.on svg{fill:currentColor;}
+.card-flag{position:absolute; top:8px; right:8px; z-index:2;}
+.gloss-item.has-flag{position:relative; padding-right:48px;}
+.gloss-item.has-flag .flag-btn{position:absolute; top:50%; right:2px; transform:translateY(-50%);}
+.fl-row .flag-btn{margin-left:-6px;}
+.tag-toggle{display:inline-flex; align-items:center; gap:6px; margin-top:10px; padding:7px 12px; border-radius:999px; border:1px solid var(--border); background:var(--surface); color:var(--text-muted); font:inherit; font-size:13px; font-weight:700; cursor:pointer;}
+.tag-toggle svg{width:16px; height:16px; fill:none;}
+.tag-toggle.on{color:#b57c00; border-color:#d99a00; background:color-mix(in srgb, #d99a00 12%, var(--surface));}
+.tag-toggle.on svg{fill:currentColor;}
+.review-item .tag-toggle{margin-top:6px;}
+.flag-box{margin-top:10px;}
+.q-flagrow{margin:-4px 0 4px;}
+#ocr-status-text{white-space:pre-line;}
 </style>
 </head>
-#ocr-status-text{white-space:pre-line;}
 <body>
 
 <div id="app">
@@ -833,7 +859,9 @@ button,.pill,.seg-btn,.opt,.chapter-card{touch-action:manipulation; -webkit-tap-
       <div class="chapter-context" id="flash-chapter-title"></div>
       <div class="opt-row">
         <label><input type="checkbox" id="flash-only-new"> 未習得の単語だけ</label>
+        <label><input type="checkbox" id="flash-only-flag"> 付箋の単語だけ</label>
         <label><input type="checkbox" id="flash-shuffle"> シャッフル</label>
+        <label><input type="checkbox" id="flash-autospeak"> 自動で発音</label>
       </div>
       <div class="toggle-row">
         <div class="seg-toggle" id="flash-dir-toggle" aria-label="カードの表面">
@@ -858,12 +886,14 @@ button,.pill,.seg-btn,.opt,.chapter-card{touch-action:manipulation; -webkit-tap-
           <div class="flashcard-inner" id="flashcard-inner">
             <div class="fc-face front">
               <div class="fc-top-row"><span class="fc-tag" id="fc-tag-front">章</span></div>
+              <button class="iconbtn flag-btn card-flag" id="fc-flag-front" data-act="cardflag" aria-label="付箋"></button>
               <div class="fc-en" id="fc-front-main">–</div>
               <button class="iconbtn speak-btn" id="fc-speak" title="発音を聞く" aria-label="発音を聞く"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M19 5a10 10 0 0 1 0 14"/></svg></button>
               <div class="fc-hint" id="fc-hint-front">タップして意味を見る</div>
             </div>
             <div class="fc-face back">
               <div class="fc-top-row"><span class="fc-tag" id="fc-tag-back">章</span></div>
+              <button class="iconbtn flag-btn card-flag" id="fc-flag-back" data-act="cardflag" aria-label="付箋"></button>
               <div class="fc-en-sm" id="fc-back-sub">–</div>
               <div class="fc-ja" id="fc-back-main">–</div>
               <button class="iconbtn speak-btn" id="fc-speak-back" title="発音を聞く" aria-label="発音を聞く" hidden><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M19 5a10 10 0 0 1 0 14"/></svg></button>
@@ -891,16 +921,20 @@ button,.pill,.seg-btn,.opt,.chapter-card{touch-action:manipulation; -webkit-tap-
       <div class="page-head">
         <span class="eyebrow">Test</span>
         <h1>単語テスト</h1>
-        <p>英単語を見て、正しい日本語の意味を4つの選択肢から選びます。</p>
+        <p>英語と日本語を、4択またはスペル入力で確認します。</p>
       </div>
 
       <div id="quiz-setup" class="quiz-setup panel">
         <div id="quiz-wrong-panel"></div>
+        <div id="quiz-flag-panel"></div>
         <div class="setup-label" style="margin-top:0;">出題する章 (複数選べます)</div>
         <div class="pill-row" id="quiz-chapter-pills"></div>
+        <div class="setup-label">出題形式</div>
+        <div class="pill-row" id="quiz-type-pills"></div>
         <div class="setup-label">出題数</div>
         <div class="pill-row" id="quiz-count-pills"></div>
         <p class="count-note" id="quiz-count-note"></p>
+        <div class="opt-row"><label><input type="checkbox" id="quiz-autospeak"> 自動で発音</label></div>
         <div class="btn-row" style="margin-top:16px;">
           <button class="btn btn-primary" id="quiz-start-btn">テストを開始</button>
         </div>
@@ -922,6 +956,7 @@ button,.pill,.seg-btn,.opt,.chapter-card{touch-action:manipulation; -webkit-tap-
         <input type="text" id="words-search" placeholder="英単語・意味を検索">
       </div>
       <div class="pill-row" id="words-chapter-pills"></div>
+      <div class="opt-row"><label><input type="checkbox" id="words-flag-only"> 付箋をつけた単語だけ</label></div>
       <div id="words-list"></div>
     </section>
 
@@ -995,15 +1030,57 @@ function toast(msg){
   toastTimer = setTimeout(function(){ t.classList.remove("show"); }, 2600);
 }
 var ICON_SPEAKER = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M19 5a10 10 0 0 1 0 14"/></svg>';
+var autoSpeak = false;
+try{ autoSpeak = localStorage.getItem("vocab_autospeak") === "1"; }catch(e){}
+var enVoice = null;
+function pickVoice(){
+  try{
+    var vs = window.speechSynthesis.getVoices() || [], best = null, i;
+    for(i=0;i<vs.length;i++){ if(vs[i].lang === "en-US" && /Samantha|Ava|Allison|Google US|Aaron|Nicky/i.test(vs[i].name)){ best = vs[i]; break; } }
+    if(!best) for(i=0;i<vs.length;i++){ if(vs[i].lang === "en-US"){ best = vs[i]; break; } }
+    if(!best) for(i=0;i<vs.length;i++){ if(/^en/i.test(vs[i].lang)){ best = vs[i]; break; } }
+    enVoice = best;
+  }catch(e){}
+}
+try{
+  if(window.speechSynthesis){
+    pickVoice();
+    if(window.speechSynthesis.addEventListener) window.speechSynthesis.addEventListener("voiceschanged", pickVoice);
+    else window.speechSynthesis.onvoiceschanged = pickVoice;
+  }
+}catch(e){}
 function speak(text){
   try{
-    if(!window.speechSynthesis) return;
+    if(!window.speechSynthesis || !text) return;
     window.speechSynthesis.cancel();
     var u = new SpeechSynthesisUtterance(text);
     u.lang = "en-US";
+    if(enVoice) u.voice = enVoice;
     u.rate = 0.9;
     window.speechSynthesis.speak(u);
   }catch(e){}
+}
+/* ---- sticky tag (付箋) ---- */
+var ICON_TAG = '<svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4.5L5 21V4a1 1 0 0 1 1-1z"/></svg>';
+function isFlagged(id){ return !!state.flags[id]; }
+function toggleFlag(id){
+  if(!wordById(id)) return false;
+  if(state.flags[id]) delete state.flags[id]; else state.flags[id] = true;
+  saveState();
+  return !!state.flags[id];
+}
+function flagBtnHTML(id, cls){
+  var on = isFlagged(id);
+  return '<button class="iconbtn flag-btn'+(on?" on":"")+(cls?" "+cls:"")+'" data-act="flag" data-id="'+esc(id)+'" aria-pressed="'+(on?"true":"false")+'" title="'+(on?"付箋をはずす":"付箋をつける")+'" aria-label="'+(on?"付箋をはずす":"付箋をつける")+'">'+ICON_TAG+'</button>';
+}
+function flaggedIds(chId){
+  return state.words.filter(function(w){ return state.flags[w.id] && (!chId || w.ch === chId); }).map(function(w){ return w.id; });
+}
+function speakAuto(text){ if(autoSpeak) speak(text); }
+function setAutoSpeak(on){
+  autoSpeak = !!on;
+  try{ localStorage.setItem("vocab_autospeak", autoSpeak ? "1" : "0"); }catch(e){}
+  ["flash-autospeak","quiz-autospeak"].forEach(function(id){ var el = $(id); if(el) el.checked = autoSpeak; });
 }
 
 /* ============================================================
@@ -1058,7 +1135,7 @@ function refreshAllViews(){ show(curView); }
    STATE / STORAGE
    ============================================================ */
 var STORE_KEY = "vocab_study_progress_v1";
-function emptyState(){ return {chapters:[], words:[], cards:{}, quizHistory:{}, wrongIds:{}, updatedAt:0}; }
+function emptyState(){ return {chapters:[], words:[], cards:{}, quizHistory:{}, wrongIds:{}, flags:{}, updatedAt:0}; }
 function normalizeState(s){
   var e = emptyState();
   if(!s || typeof s !== "object") return e;
@@ -1067,6 +1144,7 @@ function normalizeState(s){
   e.cards = (s.cards && typeof s.cards === "object") ? s.cards : {};
   e.quizHistory = (s.quizHistory && typeof s.quizHistory === "object") ? s.quizHistory : {};
   e.wrongIds = (s.wrongIds && typeof s.wrongIds === "object") ? s.wrongIds : {};
+  e.flags = (s.flags && typeof s.flags === "object") ? s.flags : {};
   e.updatedAt = Number(s.updatedAt) || 0;
   return e;
 }
@@ -1183,6 +1261,9 @@ function lastBadge(ch){
   var p = pct(t.c, t.n);
   return '<span class="ch-last '+(p>=80?"good":(p<60?"bad":""))+'">前回 '+p+'%</span>';
 }
+function wrongIdsOf(chId){
+  return Object.keys(state.wrongIds).filter(function(id){ var w = wordById(id); return w && (!chId || w.ch === chId); });
+}
 function renderHome(){
   var total = state.words.length;
   $("stat-mastered").textContent = masteredCount(state.words);
@@ -1203,6 +1284,7 @@ function renderHome(){
     return;
   }
   var ws = wordsOf(cur.id), m = masteredCount(ws), has = ws.length > 0;
+  var wrongN = wrongIdsOf(cur.id).length;
   box.innerHTML =
     '<div class="setup-label">最新の章</div>'+
     '<div class="hero-card" style="--ch-color:'+chapterColor(cur)+'">'+
@@ -1214,6 +1296,7 @@ function renderHome(){
       '<div class="hero-actions">'+
         '<button class="btn btn-primary" data-act="study"'+(has?'':' disabled')+'>カードで学習</button>'+
         '<button class="btn btn-primary" data-act="test"'+(has?'':' disabled')+'>テスト</button>'+
+        (wrongN ? '<button class="btn btn-ghost" data-act="wrong">間違えた単語を復習 ('+wrongN+'語)</button>' : '')+
         '<button class="btn btn-ghost" data-act="photo">写真を追加</button>'+
       '</div>'+
       '<button class="hero-open" data-act="open">単語の確認・修正 ›</button>'+
@@ -1244,6 +1327,7 @@ $("view-home").addEventListener("click", function(e){
   var a = act.dataset.act;
   if(a === "study"){ flash.ch = cur.id; show("flash"); }
   else if(a === "test"){ quiz.sel = {}; quiz.sel[cur.id] = true; quiz.initSel = true; show("quiz"); }
+  else if(a === "wrong"){ quiz.sel = {}; quiz.sel[cur.id] = true; quiz.initSel = true; show("quiz"); startQuiz(wrongIdsOf(cur.id), "wrong"); }
   else if(a === "open"){ openChapter(cur.id); }
   else if(a === "photo"){ openChapter(cur.id); $("ocr-file").click(); }   // straight to the photo picker (same tap)
 });
@@ -1363,7 +1447,7 @@ $("ch-words").addEventListener("click", function(e){
 });
 function removeWords(ids){
   var set = {};
-  ids.forEach(function(i){ set[i] = true; delete state.cards[i]; delete state.wrongIds[i]; });
+  ids.forEach(function(i){ set[i] = true; delete state.cards[i]; delete state.wrongIds[i]; delete state.flags[i]; });
   state.words = state.words.filter(function(w){ return !set[w.id]; });
   saveState();
 }
@@ -2421,7 +2505,7 @@ function commitReview(){
 /* ============================================================
    FLASHCARDS
    ============================================================ */
-var flash = {ch:null, mode:"card", dir:"en", onlyNew:false, shuffle:false, hide:false, deck:[], idx:0, flipped:false};
+var flash = {ch:null, mode:"card", dir:"en", onlyNew:false, onlyFlag:false, shuffle:false, hide:false, deck:[], idx:0, flipped:false};
 try{ if(localStorage.getItem("vocab_flash_dir") === "ja") flash.dir = "ja"; }catch(e){}
 
 /* Chapter picker used by cards / test / word list.
@@ -2471,6 +2555,7 @@ function noChaptersBox(el){
 function buildDeck(){
   var ws = flash.ch ? wordsOf(flash.ch) : state.words.slice();
   if(flash.onlyNew) ws = ws.filter(function(w){ return state.cards[w.id] !== "mastered"; });
+  if(flash.onlyFlag) ws = ws.filter(function(w){ return state.flags[w.id]; });
   var ids = ws.map(function(w){ return w.id; });
   flash.deck = flash.shuffle ? shuffle(ids) : ids;
   flash.idx = 0;
@@ -2483,6 +2568,7 @@ function renderFlash(){
   }
   if(flash.ch && !chapterById(flash.ch)) flash.ch = 0;
   $("flash-only-new").checked = flash.onlyNew;
+  $("flash-only-flag").checked = flash.onlyFlag;
   $("flash-shuffle").checked = flash.shuffle;
   $("flash-hide-ja").checked = flash.hide;
   document.querySelectorAll("#flash-mode-toggle .seg-btn").forEach(function(b){
@@ -2509,13 +2595,14 @@ function renderFlash(){
   }
   if(!flash.deck.length){
     empty.hidden = false;
-    empty.textContent = flash.onlyNew ? "この範囲の単語はすべて「覚えた」になっています。「未習得の単語だけ」のチェックを外すと復習できます。" : "この範囲にはまだ単語がありません。";
+    empty.textContent = flash.onlyFlag ? "この範囲に付箋をつけた単語がありません。カードの右上のしおりマークで、苦手な単語に付箋をつけられます。" : flash.onlyNew ? "この範囲の単語はすべて「覚えた」になっています。「未習得の単語だけ」のチェックを外すと復習できます。" : "この範囲にはまだ単語がありません。";
     $("fc-wrap").hidden = true; $("fc-list-wrap").hidden = true;
     return;
   }
   empty.hidden = true;
   $("fc-wrap").hidden = (flash.mode !== "card");
   $("fc-list-wrap").hidden = (flash.mode !== "list");
+  $("flash-autospeak").checked = autoSpeak;
   if(flash.mode === "card") renderCard(); else renderFlashList();
 }
 function chapterInfoLabel(id){
@@ -2524,7 +2611,7 @@ function chapterInfoLabel(id){
 }
 var deckKey = "";
 function buildDeckIfStale(){
-  var key = [flash.ch, flash.onlyNew, flash.shuffle, state.words.length].join("|");
+  var key = [flash.ch, flash.onlyNew, flash.onlyFlag, flash.shuffle, state.words.length].join("|");
   if(key !== deckKey){ deckKey = key; buildDeck(); }
 }
 function currentWord(){ return wordById(flash.deck[flash.idx]); }
@@ -2551,6 +2638,7 @@ function renderCard(){
   $("fc-back-main").className = enFirst ? "fc-ja" : "fc-en";
   $("fc-speak").hidden = !enFirst;          // never speak the answer on the question side
   $("fc-speak-back").hidden = enFirst;
+  ["fc-flag-front","fc-flag-back"].forEach(function(id){ var fb = $(id); fb.innerHTML = ICON_TAG; fb.classList.toggle("on", isFlagged(w.id)); fb.setAttribute("aria-pressed", isFlagged(w.id) ? "true" : "false"); fb.title = isFlagged(w.id) ? "付箋をはずす" : "付箋をつける"; });
   $("fc-hint-front").textContent = enFirst ? "タップして意味を見る" : "タップして英語を見る";
   $("fc-count").textContent = (flash.idx+1)+" / "+flash.deck.length;
   $("fc-progress-fill").style.width = Math.round((flash.idx+1)/flash.deck.length*100)+"%";
@@ -2566,6 +2654,7 @@ function goCard(delta){
   if(n < 0 || n >= flash.deck.length) return;
   flash.idx = n; flash.flipped = false;
   renderCard();
+  if(flash.dir === "en"){ var cw = currentWord(); if(cw) speakAuto(cw.en); }
 }
 function markCard(status){
   var w = currentWord();
@@ -2579,8 +2668,17 @@ function markCard(status){
 }
 $("flashcard").addEventListener("click", function(e){
   if(e.target.closest("#fc-speak, #fc-speak-back")) return;
+  if(e.target.closest("[data-act=cardflag]")){
+    var cw0 = currentWord();
+    if(cw0){
+      toggleFlag(cw0.id); renderCard();
+      if(flash.onlyFlag && !on0){ /* stays in this deck until the deck is rebuilt */ }
+    }
+    return;
+  }
   flash.flipped = !flash.flipped;
   renderCard();
+  if(flash.flipped && flash.dir === "ja"){ var fw = currentWord(); if(fw) speakAuto(fw.en); }
 });
 ["fc-speak","fc-speak-back"].forEach(function(id){
   $(id).addEventListener("click", function(e){
@@ -2602,6 +2700,8 @@ $("fc-mark-review").addEventListener("click", function(){ markCard("review"); })
 $("fc-mark-mastered").addEventListener("click", function(){ markCard("mastered"); });
 $("fc-reset").addEventListener("click", function(){ markCard(null); });
 $("flash-only-new").addEventListener("change", function(e){ flash.onlyNew = e.target.checked; renderFlash(); });
+$("flash-autospeak").addEventListener("change", function(e){ setAutoSpeak(e.target.checked); });
+$("flash-only-flag").addEventListener("change", function(e){ flash.onlyFlag = e.target.checked; renderFlash(); });
 $("flash-shuffle").addEventListener("change", function(e){ flash.shuffle = e.target.checked; renderFlash(); });
 $("flash-hide-ja").addEventListener("change", function(e){ flash.hide = e.target.checked; renderFlash(); });
 $("flash-mode-toggle").addEventListener("click", function(e){
@@ -2624,6 +2724,7 @@ function renderFlashList(){
       (enFirst
         ? enHtml("") + '<div class="fl-ja fl-ans">'+esc(w.ja)+'</div>'
         : '<div class="fl-ja q">'+esc(w.ja)+'</div>' + enHtml(" a fl-ans"))+
+      flagBtnHTML(w.id)+
       '</div>';
   });
   box.innerHTML = html;
@@ -2635,6 +2736,8 @@ $("fc-list").addEventListener("click", function(e){
     var w = wordById(row.dataset.id); if(w) speak(w.en);
     return;
   }
+  var fbtn = e.target.closest("[data-act=flag]");
+  if(fbtn){ var on1 = toggleFlag(row.dataset.id); fbtn.classList.toggle("on", on1); fbtn.setAttribute("aria-pressed", on1 ? "true" : "false"); return; }
   var ans = e.target.closest(".fl-ans");
   if(ans) ans.classList.toggle("revealed");
 });
@@ -2648,20 +2751,54 @@ document.addEventListener("keydown", function(e){
   }else if(curView === "quiz" && quiz.qs.length && !$("quiz-play").hidden){
     var q = quiz.qs[quiz.i];
     if(!q) return;
-    if(!quiz.locked && /^[1-4]$/.test(e.key)){ answerQuiz(Number(e.key)-1); }
+    if(!quiz.locked && q.opts && /^[1-4]$/.test(e.key)){ answerQuiz(Number(e.key)-1); }
     else if(quiz.locked && (e.key === "Enter" || e.key === " ")){ e.preventDefault(); nextQuiz(); }
   }
 });
 
 /* ============================================================
-   TEST (English -> Japanese, 4 choices)
+   TEST (4 choices / spelling)
    ============================================================ */
-var quiz = {sel:{}, count:10, mode:"chapters", qs:[], i:0, locked:false, initSel:false};
+var quiz = {sel:{}, count:10, mode:"chapters", type:"en2ja", qs:[], i:0, locked:false, initSel:false};
+try{ var qt0 = localStorage.getItem("vocab_quiz_type"); if(qt0 === "en2ja" || qt0 === "ja2en" || qt0 === "spell") quiz.type = qt0; }catch(e){}
+var QTYPES = [["en2ja","英語 → 日本語 (4択)"], ["ja2en","日本語 → 英語 (4択)"], ["spell","日本語 → 英語 (スペル入力)"]];
 var LETTERS = ["A","B","C","D"];
+
+/* ---- answer checking for spelling questions ---- */
+function normAns(s){
+  return String(s || "").toLowerCase().replace(/[‘’]/g, "'").replace(/\s+/g, " ").replace(/^[\s.。]+|[\s.。]+$/g, "");
+}
+function answerForms(en){
+  var out = [normAns(en)];
+  String(en).split(/\s*[\/;；]\s*/).forEach(function(p){ p = normAns(p); if(p && out.indexOf(p) < 0) out.push(p); });
+  return out;
+}
+function editDist(a, b){
+  var m = a.length, n = b.length, i, j, prev = [], cur;
+  for(j=0;j<=n;j++) prev[j] = j;
+  for(i=1;i<=m;i++){
+    cur = [i];
+    for(j=1;j<=n;j++) cur[j] = Math.min(prev[j]+1, cur[j-1]+1, prev[j-1] + (a.charAt(i-1) === b.charAt(j-1) ? 0 : 1));
+    prev = cur;
+  }
+  return prev[n];
+}
+function spellPattern(en, showFirst){
+  var out = "", first = true;
+  for(var i=0;i<en.length;i++){
+    var c = en.charAt(i);
+    if(/[A-Za-z]/.test(c)){ out += (first && showFirst) ? c : "_"; first = false; }
+    else if(c === " ") out += "　";
+    else out += c;
+    out += " ";
+  }
+  return out;
+}
 
 function quizTargets(){
   return state.words.filter(function(w){ return quiz.sel[w.ch]; });
 }
+function quizMin(){ return quiz.type === "spell" ? 1 : 2; }
 function renderQuizSetup(){
   $("quiz-setup").hidden = false;
   $("quiz-play").hidden = true;
@@ -2672,15 +2809,46 @@ function renderQuizSetup(){
     quiz.sel[currentChapter().id] = true;
   }
   quiz.initSel = true;
+  $("quiz-autospeak").checked = autoSpeak;
 
-  var wrongIds = Object.keys(state.wrongIds).filter(function(id){ return wordById(id); });
+  var allWrong = wrongIdsOf(0);
+  var selWrong = allWrong.filter(function(id){ return quiz.sel[wordById(id).ch]; });
   var wp = $("quiz-wrong-panel");
-  if(wrongIds.length){
-    wp.innerHTML = '<div class="wrong-review-box"><div><div class="wrong-review-title">間違えた単語を復習</div>'+
-      '<div class="wrong-review-sub">これまでのテストで間違えた '+wrongIds.length+' 語をまとめて出題します。</div></div>'+
-      '<button class="btn btn-primary" id="quiz-wrong-btn">'+wrongIds.length+'語をテスト</button></div>';
-    $("quiz-wrong-btn").onclick = function(){ startQuiz(wrongIds, "wrong"); };
+  if(allWrong.length){
+    var bh = "";
+    if(selWrong.length) bh += '<button class="btn btn-primary" id="quiz-wrong-sel">選択中の章の間違い '+selWrong.length+'語</button>';
+    if(allWrong.length > selWrong.length) bh += '<button class="btn '+(selWrong.length ? "btn-ghost" : "btn-primary")+'" id="quiz-wrong-all">全章の間違い '+allWrong.length+'語</button>';
+    wp.innerHTML = '<div class="wrong-review-box"><div><div class="wrong-review-title">間違えた単語だけを復習</div>'+
+      '<div class="wrong-review-sub">これまでのテストで間違えた単語を、もう一度出題します。正解すると記録から消えます。</div></div>'+
+      '<div class="btn-row">'+bh+'</div></div>';
+    var b1 = $("quiz-wrong-sel"), b2 = $("quiz-wrong-all");
+    if(b1) b1.onclick = function(){ startQuiz(selWrong, "wrong"); };
+    if(b2) b2.onclick = function(){ startQuiz(allWrong, "wrong"); };
   }else wp.innerHTML = "";
+
+  var fp = $("quiz-flag-panel"), allFlag = flaggedIds(0);
+  var selFlag = allFlag.filter(function(id){ return quiz.sel[wordById(id).ch]; });
+  if(allFlag.length){
+    var fh = "";
+    if(selFlag.length) fh += '<button class="btn btn-primary" id="quiz-flag-sel">選択中の章の付箋 '+selFlag.length+'語</button>';
+    if(allFlag.length > selFlag.length) fh += '<button class="btn '+(selFlag.length ? "btn-ghost" : "btn-primary")+'" id="quiz-flag-all">全章の付箋 '+allFlag.length+'語</button>';
+    fp.innerHTML = '<div class="wrong-review-box flag-box"><div><div class="wrong-review-title">付箋をつけた単語だけをテスト</div>'+
+      '<div class="wrong-review-sub">苦手・重要として付箋をつけた単語を出題します。</div></div><div class="btn-row">'+fh+'</div></div>';
+    var f1 = $("quiz-flag-sel"), f2 = $("quiz-flag-all");
+    if(f1) f1.onclick = function(){ startQuiz(selFlag, "flag"); };
+    if(f2) f2.onclick = function(){ startQuiz(allFlag, "flag"); };
+  }else fp.innerHTML = "";
+
+  var tp = "";
+  QTYPES.forEach(function(t){ tp += '<button class="pill'+(quiz.type === t[0] ? " active" : "")+'" data-t="'+t[0]+'">'+t[1]+'</button>'; });
+  var tbox = $("quiz-type-pills");
+  tbox.innerHTML = tp;
+  tbox.onclick = function(e){
+    var b = e.target.closest(".pill"); if(!b) return;
+    quiz.type = b.dataset.t;
+    try{ localStorage.setItem("vocab_quiz_type", quiz.type); }catch(err){}
+    renderQuizSetup();
+  };
 
   if(!state.chapters.length){
     $("quiz-chapter-pills").innerHTML = '<div class="empty-box" style="width:100%">まだ章がありません。ホームで章を追加してください。</div>';
@@ -2712,39 +2880,44 @@ function renderQuizSetup(){
   };
   var actual = (quiz.count === 0 || quiz.count > total) ? total : quiz.count;
   $("quiz-count-note").textContent = total
-    ? "対象 "+total+"語 ・ 出題 "+actual+"問 (毎回ランダムな順番・選択肢)"
+    ? "対象 "+total+"語 ・ 出題 "+actual+"問 (毎回ランダムな順番"+(quiz.type === "spell" ? "" : "・選択肢")+")"
     : "章を1つ以上選んでください。";
-  $("quiz-start-btn").disabled = total < 2;
-  if(total === 1) $("quiz-count-note").textContent = "テストには2語以上必要です。";
+  $("quiz-start-btn").disabled = total < quizMin();
+  if(total > 0 && total < quizMin()) $("quiz-count-note").textContent = "この形式のテストには"+quizMin()+"語以上必要です。";
 }
+$("quiz-autospeak").addEventListener("change", function(e){ setAutoSpeak(e.target.checked); });
 $("quiz-start-btn").addEventListener("click", function(){
   var t = quizTargets();
   startQuiz(t.map(function(w){ return w.id; }), "chapters");
 });
 
 function startQuiz(ids, mode){
+  var spell = quiz.type === "spell", f = quiz.type === "en2ja" ? "ja" : "en";
   var targets = ids.map(wordById).filter(Boolean);
-  if(targets.length < 2){ toast("テストには2語以上必要です"); return; }
+  if(!targets.length || (!spell && state.words.length < 2)){ toast("テストできる単語が足りません"); return; }
   var pool = shuffle(targets);
-  var n = (mode === "wrong" || quiz.count === 0 || quiz.count > pool.length) ? pool.length : quiz.count;
+  var n = (mode === "wrong" || mode === "flag" || quiz.count === 0 || quiz.count > pool.length) ? pool.length : quiz.count;
   pool = pool.slice(0, n);
   var targetSet = {};
   targets.forEach(function(w){ targetSet[w.id] = true; });
   var others = state.words.filter(function(w){ return !targetSet[w.id]; });
   quiz.mode = mode;
   quiz.qs = pool.map(function(w){
-    var used = {}; used[w.ja] = true;
+    if(spell) return {w:w, opts:null, ci:-1, picked:null, typed:"", hint:false, exact:false, ok:false};
+    var used = {}; used[String(w[f]).toLowerCase()] = true;
     var picks = [];
     var sources = [shuffle(targets), shuffle(others)];
     sources.forEach(function(src){
       src.forEach(function(c){
-        if(picks.length >= 3 || c.id === w.id || used[c.ja]) return;
-        used[c.ja] = true; picks.push(c);
+        var key = String(c[f]).toLowerCase();
+        if(picks.length >= 3 || c.id === w.id || used[key]) return;
+        used[key] = true; picks.push(c);
       });
     });
     var opts = shuffle([w].concat(picks));
     return {w:w, opts:opts, ci:opts.indexOf(w), picked:null, ok:false};
-  });
+  }).filter(function(q){ return !q.opts || q.opts.length >= 2; });
+  if(!quiz.qs.length){ toast("選択肢を作れませんでした"); return; }
   quiz.i = 0; quiz.locked = false;
   $("quiz-setup").hidden = true;
   $("quiz-result").hidden = true;
@@ -2752,39 +2925,88 @@ function startQuiz(ids, mode){
   window.scrollTo(0,0);
   renderQuestion();
 }
+function qPrompt(q){ return quiz.type === "en2ja" ? q.w.en : q.w.ja; }
+function qAnswer(q){ return quiz.type === "en2ja" ? q.w.ja : q.w.en; }
 function renderQuestion(){
   var q = quiz.qs[quiz.i];
   var total = quiz.qs.length;
   var ch = chapterById(q.w.ch);
   var okSoFar = quiz.qs.filter(function(x){ return x.ok; }).length;
+  var type = quiz.type;
+  var sub = type === "en2ja" ? "この単語の意味はどれですか？(キーボードの 1〜4 でも選べます)"
+          : (type === "ja2en" ? "この意味の英単語はどれですか？(キーボードの 1〜4 でも選べます)" : "この意味の英単語を、スペルを入力して答えてください。");
   var html = '<div class="q-progress"><span class="mono">Q '+(quiz.i+1)+' / '+total+'</span><span>正解 <b class="mono">'+okSoFar+'</b></span></div>'+
     '<div class="progress-track" style="margin-bottom:16px;--ch-color:var(--accent)"><div class="progress-fill" style="width:'+Math.round(quiz.i/total*100)+'%"></div></div>'+
     '<div class="q-card" style="--ch-color:'+(ch?chapterColor(ch):"var(--accent)")+'">'+
       '<span class="q-tag">'+esc(ch ? (chapterIndex(ch.id)+1)+". "+ch.title : "")+'</span>'+
-      '<div class="q-word"><span>'+esc(q.w.en)+'</span><button class="iconbtn speak-btn" id="q-speak" aria-label="発音を聞く">'+ICON_SPEAKER+'</button></div>'+
-      '<div class="q-sub">この単語の意味はどれですか？(キーボードの 1〜4 でも選べます)</div>'+
-      '<div class="opt-list">';
-  q.opts.forEach(function(o, k){
-    html += '<button class="opt" data-k="'+k+'"><span class="opt-letter">'+LETTERS[k]+'</span><span>'+esc(o.ja)+'</span></button>';
-  });
-  html += '</div><div id="q-feedback"></div></div>'+
+      '<div class="q-word"><span>'+esc(qPrompt(q))+'</span>'+
+        (type === "en2ja" ? '<button class="iconbtn speak-btn" id="q-speak" aria-label="発音を聞く">'+ICON_SPEAKER+'</button>' : '')+'</div>'+
+      '<div class="q-sub">'+sub+'</div>';
+  if(type === "spell"){
+    var letters = q.w.en.replace(/[^A-Za-z]/g, "").length;
+    html += '<div class="spell-pat" id="q-pat" aria-label="'+letters+'文字">'+esc(spellPattern(q.w.en, false))+'</div>'+
+      '<div class="spell-count">'+letters+'文字</div>'+
+      '<input id="q-input" class="inp spell-inp" type="text" inputmode="text" enterkeyhint="done" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" placeholder="ここに入力" aria-label="英単語">'+
+      '<div class="spell-btns"><button class="btn btn-primary" id="q-submit">答える</button>'+
+      '<button class="btn btn-ghost btn-sm" id="q-hint">頭文字のヒント</button>'+
+      '<button class="btn btn-ghost btn-sm" id="q-skip">わからない</button></div>';
+  }else{
+    html += '<div class="opt-list">';
+    q.opts.forEach(function(o, k){
+      var label = type === "en2ja" ? o.ja : o.en;
+      html += '<button class="opt" data-k="'+k+'"><span class="opt-letter">'+LETTERS[k]+'</span><span>'+esc(label)+'</span></button>';
+    });
+    html += '</div>';
+  }
+  html += '<div id="q-feedback"></div></div>'+
     '<div class="btn-row"><button class="btn btn-ghost btn-sm" id="q-quit">テストをやめる</button></div>';
   $("quiz-play").innerHTML = html;
   quiz.locked = false;
+  if(type === "en2ja") speakAuto(q.w.en);
+  if(type === "spell"){ var inp = $("q-input"); if(inp) try{ inp.focus({preventScroll:true}); }catch(e){ inp.focus(); } }
 }
 $("quiz-play").addEventListener("click", function(e){
   if(e.target.closest("#q-speak")){ var q0 = quiz.qs[quiz.i]; if(q0) speak(q0.w.en); return; }
+  if(e.target.closest("#q-speak-fb")){ var q1 = quiz.qs[quiz.i]; if(q1) speak(q1.w.en); return; }
   if(e.target.closest("#q-quit")){
     if(confirm("テストを中断しますか？(ここまでの結果は記録されません)")){ renderQuizSetup(); }
     return;
   }
   if(e.target.closest("#q-next")){ nextQuiz(); return; }
+  var qf = e.target.closest("[data-act=qflag]");
+  if(qf){ var onq = toggleFlag(qf.dataset.id); qf.classList.toggle("on", onq); qf.querySelector("span").textContent = onq ? "付箋をはずす" : "付箋をつける"; return; }
+  if(e.target.closest("#q-submit")){ submitSpell(false); return; }
+  if(e.target.closest("#q-skip")){ submitSpell(true); return; }
+  if(e.target.closest("#q-hint")){
+    var qh = quiz.qs[quiz.i];
+    if(qh && !quiz.locked){
+      qh.hint = true;
+      $("q-pat").textContent = spellPattern(qh.w.en, true);
+      var hb = $("q-hint"); hb.disabled = true; hb.textContent = "ヒント使用 (この問題は不正解扱い)";
+      var hi = $("q-input"); if(hi) hi.focus();
+    }
+    return;
+  }
   var opt = e.target.closest(".opt");
   if(opt && !quiz.locked) answerQuiz(Number(opt.dataset.k));
 });
+$("quiz-play").addEventListener("keydown", function(e){
+  if(!e.target || e.target.id !== "q-input" || e.key !== "Enter" || e.isComposing) return;
+  e.preventDefault();
+  if(quiz.locked) nextQuiz(); else submitSpell(false);
+});
+function feedbackHTML(q, head, extra){
+  var last = quiz.i === quiz.qs.length-1;
+  return '<div class="explain"><b>'+head+'</b>　'+esc(q.w.en)+' = '+esc(q.w.ja)+
+    (quiz.type !== "en2ja" ? ' <button class="iconbtn speak-btn" id="q-speak-fb" aria-label="発音を聞く">'+ICON_SPEAKER+'</button>' : '')+
+    (extra ? '<div class="explain-sub">'+extra+'</div>' : '')+
+    '</div>'+
+    '<div class="q-flagrow">'+'<button class="tag-toggle'+(isFlagged(q.w.id) ? ' on' : '')+'" data-act="qflag" data-id="'+esc(q.w.id)+'">'+ICON_TAG+'<span>'+(isFlagged(q.w.id) ? '付箋をはずす' : '付箋をつける')+'</span></button>'+'</div>'+
+    '<div class="q-next"><button class="btn btn-primary" id="q-next">'+(last?"結果を見る":"次へ")+'</button></div>';
+}
 function answerQuiz(k){
   var q = quiz.qs[quiz.i];
-  if(!q || quiz.locked || !q.opts[k]) return;
+  if(!q || !q.opts || quiz.locked || !q.opts[k]) return;
   quiz.locked = true;
   q.picked = k; q.ok = (k === q.ci);
   var btns = $("quiz-play").querySelectorAll(".opt");
@@ -2793,9 +3015,33 @@ function answerQuiz(k){
     if(idx === q.ci) b.classList.add("correct");
     else if(idx === k) b.classList.add("incorrect");
   });
-  var last = quiz.i === quiz.qs.length-1;
-  $("q-feedback").innerHTML = '<div class="explain"><b>'+(q.ok?"正解！":"不正解")+'</b>　'+esc(q.w.en)+' = '+esc(q.w.ja)+'</div>'+
-    '<div class="q-next"><button class="btn btn-primary" id="q-next">'+(last?"結果を見る":"次へ")+'</button></div>';
+  $("q-feedback").innerHTML = feedbackHTML(q, q.ok ? "正解！" : "不正解", "");
+  if(quiz.type !== "en2ja") speakAuto(q.w.en);
+}
+function submitSpell(giveUp){
+  var q = quiz.qs[quiz.i];
+  if(!q || quiz.locked || quiz.type !== "spell") return;
+  var inp = $("q-input"), typed = giveUp ? "" : (inp ? inp.value : "");
+  if(!giveUp && !normAns(typed)){ toast("スペルを入力してください"); if(inp) inp.focus(); return; }
+  quiz.locked = true;
+  q.typed = typed.trim();
+  var forms = answerForms(q.w.en), t = normAns(typed);
+  q.exact = forms.indexOf(t) >= 0;
+  q.ok = q.exact && !q.hint;
+  if(inp){ inp.readOnly = true; inp.classList.add(q.exact ? "correct" : "incorrect"); }
+  ["q-submit","q-hint","q-skip"].forEach(function(id){ var b = $(id); if(b) b.hidden = true; });
+  var head, extra = "";
+  if(q.ok) head = "正解！";
+  else if(q.exact && q.hint){ head = "不正解"; extra = "綴りは合っていますが、ヒントを使ったので不正解として記録します。"; }
+  else{
+    head = "不正解";
+    var best = 99;
+    forms.forEach(function(fm){ best = Math.min(best, editDist(t, fm)); });
+    if(t && best <= (t.length >= 8 ? 2 : 1)) extra = "惜しい！綴りが少し違います。";
+    if(t) extra += (extra ? "<br>" : "") + "あなたの答え: <b>"+esc(q.typed)+"</b>";
+  }
+  $("q-feedback").innerHTML = feedbackHTML(q, head, extra);
+  speakAuto(q.w.en);
 }
 function nextQuiz(){
   if(!quiz.locked) return;
@@ -2812,10 +3058,10 @@ function finishQuiz(){
     by[c].n++; if(q.ok) by[c].c++;
     if(q.ok) delete state.wrongIds[q.w.id]; else state.wrongIds[q.w.id] = true;
   });
-  if(quiz.mode !== "wrong"){
+  if(quiz.mode === "chapters"){
     Object.keys(by).forEach(function(id){
       var h = state.quizHistory[id] = state.quizHistory[id] || [];
-      h.push({t:Date.now(), c:by[id].c, n:by[id].n});
+      h.push({t:Date.now(), c:by[id].c, n:by[id].n, ty:quiz.type});
       if(h.length > 30) h.splice(0, h.length-30);
     });
   }
@@ -2841,9 +3087,12 @@ function finishQuiz(){
   if(wrong.length){
     html += '<div class="setup-label">間違えた単語 ('+wrong.length+'語)</div><div class="review-list">';
     wrong.forEach(function(q){
-      html += '<div class="review-item"><div class="rq">'+esc(q.w.en)+'</div>'+
-        '<div class="ra right">正解: <b>'+esc(q.w.ja)+'</b></div>'+
-        '<div class="ra wrong">あなたの答え: <b>'+esc(q.opts[q.picked] ? q.opts[q.picked].ja : "")+'</b></div></div>';
+      var mine = quiz.type === "spell" ? (q.typed || "(未入力)")
+        : (q.opts[q.picked] ? (quiz.type === "en2ja" ? q.opts[q.picked].ja : q.opts[q.picked].en) : "");
+      html += '<div class="review-item"><div class="rq">'+esc(qPrompt(q))+'</div>'+
+        '<div class="ra right">正解: <b>'+esc(qAnswer(q))+'</b></div>'+
+        '<div class="ra wrong">あなたの答え: <b>'+esc(mine)+'</b></div>'+
+        '<button class="tag-toggle'+(isFlagged(q.w.id) ? ' on' : '')+'" data-act="qflag" data-id="'+esc(q.w.id)+'">'+ICON_TAG+'<span>'+(isFlagged(q.w.id) ? '付箋をはずす' : '付箋をつける')+'</span></button></div>';
     });
     html += '</div>';
   }
@@ -2858,6 +3107,10 @@ function finishQuiz(){
   window.scrollTo(0,0);
   var rw = $("res-retry-wrong");
   if(rw) rw.onclick = function(){ startQuiz(wrong.map(function(q){ return q.w.id; }), "wrong"); };
+  r.onclick = function(e){
+    var qf = e.target.closest("[data-act=qflag]");
+    if(qf){ var onq = toggleFlag(qf.dataset.id); qf.classList.toggle("on", onq); qf.querySelector("span").textContent = onq ? "付箋をはずす" : "付箋をつける"; }
+  };
   $("res-again").onclick = function(){ renderQuizSetup(); };
   $("res-home").onclick = function(){ show("home"); };
 }
@@ -2865,10 +3118,11 @@ function finishQuiz(){
 /* ============================================================
    WORD LIST (all chapters)
    ============================================================ */
-var wordsFilter = {ch:0, q:"", userPicked:false};
+var wordsFilter = {ch:0, q:"", userPicked:false, flag:false};
 function renderWords(){
   if(!wordsFilter.userPicked){ var cw = currentChapter(); wordsFilter.ch = cw ? cw.id : 0; }   // starts on this week's chapter
-  $("words-sub").textContent = "全"+state.words.length+"語を登録済みです。";
+  $("words-sub").textContent = "全"+state.words.length+"語を登録済みです。"+(flaggedIds(0).length ? "(付箋 "+flaggedIds(0).length+"語)" : "");
+  $("words-flag-only").checked = wordsFilter.flag;
   if(wordsFilter.ch && !chapterById(wordsFilter.ch)) wordsFilter.ch = 0;
   renderChapterPills("words-chapter-pills", wordsFilter.ch, true, function(v){
     wordsFilter.ch = v; wordsFilter.userPicked = true; renderWords();
@@ -2878,6 +3132,7 @@ function renderWords(){
   state.chapters.forEach(function(ch, i){
     if(wordsFilter.ch && wordsFilter.ch !== ch.id) return;
     var ws = wordsOf(ch.id).filter(function(w){
+      if(wordsFilter.flag && !state.flags[w.id]) return false;
       return !q || w.en.toLowerCase().indexOf(q) >= 0 || w.ja.toLowerCase().indexOf(q) >= 0;
     });
     if(!ws.length) return;
@@ -2885,12 +3140,20 @@ function renderWords(){
       '<span class="cat-count">'+ws.length+'語</span></div><dl style="margin:0">';
     ws.forEach(function(w){
       var st = state.cards[w.id];
-      html += '<div class="gloss-item'+(st?" status-"+st:"")+'"><dt>'+esc(w.en)+'</dt><dd>'+esc(w.ja)+'</dd></div>';
+      html += '<div class="gloss-item has-flag'+(st?" status-"+st:"")+'" data-id="'+esc(w.id)+'"><dt>'+esc(w.en)+'</dt><dd>'+esc(w.ja)+'</dd>'+flagBtnHTML(w.id)+'</div>';
     });
     html += '</dl></div>';
   });
   $("words-list").innerHTML = html || '<div class="empty-note">'+(state.words.length ? "該当する単語がありません。" : "まだ単語がありません。ホームで章を追加して、写真から取り込みましょう。")+'</div>';
 }
+$("words-flag-only").addEventListener("change", function(e){ wordsFilter.flag = e.target.checked; renderWords(); });
+$("words-list").addEventListener("click", function(e){
+  var b = e.target.closest("[data-act=flag]");
+  if(!b) return;
+  var on = toggleFlag(b.dataset.id);
+  if(wordsFilter.flag && !on) renderWords();
+  else{ b.classList.toggle("on", on); b.setAttribute("aria-pressed", on ? "true" : "false"); }
+});
 $("words-search").addEventListener("input", function(e){ wordsFilter.q = e.target.value; renderWords(); });
 
 /* ============================================================
@@ -2960,6 +3223,7 @@ function cloudPayload(){
     cards: state.cards,
     quizHistory: state.quizHistory,
     wrongIds: state.wrongIds,
+    flags: state.flags,
     localUpdatedAt: state.updatedAt || Date.now(),
     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
   };
@@ -2967,7 +3231,7 @@ function cloudPayload(){
 function applyRemote(remote){
   state = normalizeState({
     chapters: remote.chapters, words: remote.words, cards: remote.cards,
-    quizHistory: remote.quizHistory, wrongIds: remote.wrongIds, updatedAt: remote.localUpdatedAt
+    quizHistory: remote.quizHistory, wrongIds: remote.wrongIds, flags: remote.flags, updatedAt: remote.localUpdatedAt
   });
   try{ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }catch(e){}
   curCh = null; resetOcr(); deckKey = "";
